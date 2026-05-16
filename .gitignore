@@ -1,36 +1,15 @@
-# 가상환경
-Yolo_env/
-__pycache__/
-*.pyc
-*.pyo
-.env
-
-# 모델 가중치 (용량 큼)
+# 모델 가중치 (100MB 초과 → GitHub 업로드 불가)
 *.pt
 *.pth
-*.onnx
 
 # 데이터셋 (용량 큼)
 images_data/
-Yolo_env/images_data/
 
-# 학습 결과
+# 학습 결과 (용량 큼)
 runs/
 
-# 사용자 데이터 (개인정보)
-users.json
-user_history.json
-challenge_results.json
-history_images/
-
-# 로그
-*.log
-*.csv
-
-# OS
+# 캐시
+__pycache__/
+*.pyc
 .DS_Store
 Thumbs.db
-
-# IDE
-.vscode/
-.idea/
