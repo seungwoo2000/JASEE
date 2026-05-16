@@ -1,0 +1,28 @@
+# 딥러닝 / 모델
+torch>=2.5.1
+torchvision>=0.20.1
+torchaudio>=2.5.1
+ultralytics>=8.4.0
+
+# 웹앱
+streamlit>=1.40.0
+streamlit-webrtc>=0.47.0
+
+# 컴퓨터 비전
+opencv-python>=4.10.0
+Pillow>=10.0.0
+
+# 데이터 처리
+numpy>=1.26.0
+pandas>=2.0.0
+altair>=5.0.0
+
+# 데이터 증강
+albumentations>=1.4.0
+
+# 음성 안내
+pyttsx3>=2.90
+
+# 기타
+requests>=2.31.0
+PyYAML>=6.0

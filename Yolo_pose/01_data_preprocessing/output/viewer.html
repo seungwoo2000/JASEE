@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pose Landmark Viewer - Sitting Pose Project</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+            --accent: #22d3ee;
+        }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        header {
+            padding: 1rem 2rem;
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        main {
+            flex: 1;
+            display: flex;
+            padding: 2rem;
+            gap: 2rem;
+            overflow: hidden;
+        }
+        .viewer-container {
+            flex: 2;
+            background: var(--card);
+            border-radius: 1rem;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .controls {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            max-width: 400px;
+        }
+        .card {
+            background: var(--card);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .nav-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        button:disabled {
+            background: #475569;
+            cursor: not-allowed;
+        }
+        .stats {
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+        #info-panel {
+            font-family: monospace;
+            font-size: 0.85rem;
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+        .loading {
+            position: absolute;
+            inset: 0;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 style="margin:0; font-size: 1.2rem;">Pose Landmark Viewer</h1>
+        <div class="stats" id="progress-text">Loading data...</div>
+    </header>
+
+    <main>
+        <div class="viewer-container" id="container">
+            <div id="loader" class="loading">CSV 데이터를 불러오는 중...</div>
+            <canvas id="canvas"></canvas>
+        </div>
+
+        <div class="controls">
+            <div class="card">
+                <h3>Controls</h3>
+                <div class="nav-buttons">
+                    <button id="prevBtn">Previous</button>
+                    <button id="nextBtn">Next</button>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <input type="range" id="slider" style="width: 100%;" min="0" value="0">
+                </div>
+                <div style="margin-top: 1rem;">
+                    <input type="text" id="search" placeholder="Search filename..." style="width: 100%; padding: 0.5rem; border-radius: 0.25rem; border: 1px solid #475569; background: #0f172a; color: white;">
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Image Info</h3>
+                <div id="info-panel">
+                    Select an image to see details
+                </div>
+            </div>
+            
+            <div class="card">
+                <p style="font-size: 0.8rem; color: #64748b;">
+                    Tip: <code>viewer_server.py</code>를 실행하여 브라우저에서 접속하세요.<br>
+                    이미지가 보이지 않으면 서버 루트 경로를 확인하세요.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const infoPanel = document.getElementById('info-panel');
+        const progressText = document.getElementById('progress-text');
+        const slider = document.getElementById('slider');
+        const searchInput = document.getElementById('search');
+
+        let data = [];
+        let currentIndex = 0;
+        const img = new Image();
+
+        // Skeleton connections (COCO format)
+        const connections = [
+            [5, 6], [5, 7], [7, 9], [6, 8], [8, 10], // arms
+            [5, 11], [6, 12], [11, 12], // torso
+            [11, 13], [13, 15], [12, 14], [14, 16]  // legs
+        ];
+        const kpNames = [
+            'nose', 'left_eye', 'right_eye', 'left_ear', 'right_ear',
+            'left_shoulder', 'right_shoulder', 'left_elbow', 'right_elbow',
+            'left_wrist', 'right_wrist', 'left_hip', 'right_hip',
+            'left_knee', 'right_knee', 'left_ankle', 'right_ankle'
+        ];
+
+        // Load CSV
+        Papa.parse('yolo_landmarks_clean.csv', {
+            download: true,
+            header: true,
+            complete: function(results) {
+                data = results.data.filter(row => row.filename);
+                slider.max = data.length - 1;
+                document.getElementById('loader').style.display = 'none';
+                updateViewer();
+            }
+        });
+
+        function resolvePath(filename, folder) {
+            // Mapping folder names to actual paths relative to semi2_contest root
+            if (folder === 'output_augmented') {
+                // We don't know if it's GOOD or BAD, so we might need to try both or use the server's mapping
+                return `../../../new images_data/images/GOOD/${filename}`; // Placeholder, handled better in server
+            } else if (folder === 'YOLO_full_body') {
+                return `../../../FOR_DA/FOR_DA/YOLO_full_body/${filename}`;
+            } else if (folder === 'YOLO_ankle_visible') {
+                return `../../../FOR_DA/FOR_DA/YOLO_ankle_visible/${filename}`;
+            }
+            return filename;
+        }
+
+        function updateViewer() {
+            if (data.length === 0) return;
+            const item = data[currentIndex];
+            
+            // For the viewer to work with the Python server, we use a simple path
+            // The server will be configured to search for images
+            img.src = `/get_image?filename=${item.filename}&folder=${item.folder}`;
+            
+            progressText.innerText = `${currentIndex + 1} / ${data.length} (${item.folder})`;
+            slider.value = currentIndex;
+            
+            infoPanel.innerHTML = `
+                <b>File:</b> ${item.filename}<br>
+                <b>Folder:</b> ${item.folder}<br>
+                <hr>
+                <b>Detection:</b> ${item.detection_success}<br>
+                <b>Persons:</b> ${item.person_count}<br>
+                <hr>
+                ${kpNames.map(name => `<b>${name}:</b> (${parseFloat(item[name+'_x']).toFixed(3)}, ${parseFloat(item[name+'_y']).toFixed(3)})`).join('<br>')}
+            `;
+        }
+
+        img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            draw();
+        };
+
+        img.onerror = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "white";
+            ctx.font = "20px Arial";
+            ctx.fillText("Image not found: " + img.src, 10, 50);
+        };
+
+        function draw() {
+            ctx.drawImage(img, 0, 0);
+            const item = data[currentIndex];
+            
+            // Draw connections
+            ctx.strokeStyle = 'rgba(0, 255, 0, 0.7)';
+            ctx.lineWidth = 3;
+            connections.forEach(([i, j]) => {
+                const name1 = kpNames[i];
+                const name2 = kpNames[j];
+                const x1 = parseFloat(item[name1 + '_x']) * canvas.width;
+                const y1 = parseFloat(item[name1 + '_y']) * canvas.height;
+                const x2 = parseFloat(item[name2 + '_x']) * canvas.width;
+                const y2 = parseFloat(item[name2 + '_y']) * canvas.height;
+                
+                if (x1 && y1 && x2 && y2) {
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.stroke();
+                }
+            });
+
+            // Draw points
+            kpNames.forEach(name => {
+                const x = parseFloat(item[name + '_x']) * canvas.width;
+                const y = parseFloat(item[name + '_y']) * canvas.height;
+                const conf = parseFloat(item[name + '_conf']);
+                
+                if (x && y) {
+                    ctx.fillStyle = conf > 0.5 ? '#22d3ee' : '#f87171';
+                    ctx.beginPath();
+                    ctx.arc(x, y, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            });
+        }
+
+        document.getElementById('nextBtn').onclick = () => {
+            if (currentIndex < data.length - 1) {
+                currentIndex++;
+                updateViewer();
+            }
+        };
+
+        document.getElementById('prevBtn').onclick = () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateViewer();
+            }
+        };
+
+        slider.oninput = (e) => {
+            currentIndex = parseInt(e.target.value);
+            updateViewer();
+        };
+
+        searchInput.onchange = (e) => {
+            const query = e.target.value.toLowerCase();
+            const found = data.findIndex(item => item.filename.toLowerCase().includes(query));
+            if (found !== -1) {
+                currentIndex = found;
+                updateViewer();
+            }
+        };
+
+        // Keyboard navigation
+        window.onkeydown = (e) => {
+            if (e.key === 'ArrowRight') document.getElementById('nextBtn').click();
+            if (e.key === 'ArrowLeft') document.getElementById('prevBtn').click();
+        };
+    </script>
+</body>
+</html>
