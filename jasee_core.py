@@ -327,8 +327,9 @@ def run_posture(frame, pose_yolo, mlp, device, env_bboxes: dict) -> dict:
                     "wrist_angle": wrist, "gaze_angle": gaze,
                     "desk_diff": desk_diff, "chair_gap": chair_gap,
                 }
-                out["result"]    = predict_posture(mlp, cva, tia, device)
-                out["gate_pass"] = is_good("CVA", cva) and is_good("TIA", tia)
+                out["result"]         = predict_posture(mlp, cva, tia, device)
+                out["gate_pass"]      = is_good("CVA", cva) and is_good("TIA", tia)
+                out["keypoints_raw"]  = lm  # numpy 배열 (환경 필터링용)
                 out["keypoints"] = {
                     "귀":    (int(lm[4][0]),  int(lm[4][1])),
                     "어깨":  (int(lm[6][0]),  int(lm[6][1])),
@@ -348,27 +349,95 @@ def run_posture(frame, pose_yolo, mlp, device, env_bboxes: dict) -> dict:
 # ───────────────────────────────────────────
 # 환경 인식
 # ───────────────────────────────────────────
-def run_environment(frame, env_yolo) -> dict:
+def run_environment(frame, env_yolo, pose_keypoints=None) -> dict:
     """
     반환값 dict:
       detected : {label: conf}
       bboxes   : {label: [x1,y1,x2,y2]}
 
-    땜빵 조치:
-      - conf=0.5 이상만 탐지 (낮은 신뢰도 제거)
-      - iou=0.3 으로 NMS 강화 (중복 박스 제거)
-      - 클래스당 confidence 가장 높은 1개만 유지
+    필터링 조치:
+      - conf=0.5, iou=0.3 으로 중복 제거
+      - 클래스당 conf 가장 높은 1개만 유지
+      - pose_keypoints 있으면 관절 근처 객체만 선택
+        chair_back/chair_seat: 골반(12) 근처
+        desk_surface: 팔꿈치(8) 근처
+        monitor: 어깨(6)→팔꿈치(8) 방향 앞쪽
     """
+    import numpy as np
+
     detected, bboxes = {}, {}
     env_results = env_yolo(frame, verbose=False, conf=0.5, iou=0.3)
+
+    candidates = {}
     for r in env_results:
         for box in r.boxes:
             x1, y1, x2, y2 = map(int, box.xyxy[0])
             cls   = int(box.cls[0])
             conf  = float(box.conf[0])
             label = ENV_CLASSES.get(cls, str(cls))
-            # 클래스당 confidence 가장 높은 1개만 유지
-            if label not in detected or conf > detected[label]:
-                detected[label] = conf
-                bboxes[label]   = [x1, y1, x2, y2]
+            if label not in candidates or conf > candidates[label]["conf"]:
+                candidates[label] = {"conf": conf, "bbox": [x1,y1,x2,y2]}
+
+    # pose_keypoints 없으면 그냥 반환
+    if pose_keypoints is None:
+        for label, v in candidates.items():
+            detected[label] = v["conf"]
+            bboxes[label]   = v["bbox"]
+        return {"detected": detected, "bboxes": bboxes}
+
+    kp = pose_keypoints
+    h, w = frame.shape[:2]
+
+    def bbox_center(bbox):
+        return ((bbox[0]+bbox[2])//2, (bbox[1]+bbox[3])//2)
+
+    def pt_dist(p1, p2):
+        return float(np.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2))
+
+    def kp_valid(idx):
+        return kp[idx][2] > 0.3
+
+    for label, v in candidates.items():
+        bbox = v["bbox"]
+        cx, cy = bbox_center(bbox)
+        accept = False
+
+        if label in ("chair_back", "chair_seat"):
+            # 골반(12) 또는 무릎(14) 근처 의자만
+            for idx in [12, 14, 11, 13]:
+                if kp_valid(idx):
+                    dist = pt_dist((cx,cy), (kp[idx][0], kp[idx][1]))
+                    if dist < w * 0.5:  # 화면 너비 50% 이내
+                        accept = True
+                        break
+
+        elif label == "desk_surface":
+            # 팔꿈치(8) 또는 손목(10) 근처 책상만
+            for idx in [8, 10, 7, 9]:
+                if kp_valid(idx):
+                    dist = pt_dist((cx,cy), (kp[idx][0], kp[idx][1]))
+                    if dist < w * 0.5:
+                        accept = True
+                        break
+
+        elif label == "monitor":
+            # 어깨(6)→팔꿈치(8) 방향 앞쪽에 있는 모니터만
+            if kp_valid(6) and kp_valid(8):
+                sh = np.array([kp[6][0], kp[6][1]])
+                el = np.array([kp[8][0], kp[8][1]])
+                mon = np.array([cx, cy])
+                # 어깨→팔꿈치 방향 벡터
+                direction = el - sh
+                to_mon    = mon - sh
+                # 내적으로 같은 방향인지 확인
+                dot = float(np.dot(direction, to_mon))
+                if dot > 0:  # 팔꿈치 방향 앞쪽
+                    accept = True
+            else:
+                accept = True  # 키포인트 없으면 그냥 허용
+
+        if accept:
+            detected[label] = v["conf"]
+            bboxes[label]   = v["bbox"]
+
     return {"detected": detected, "bboxes": bboxes}

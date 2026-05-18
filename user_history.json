@@ -283,6 +283,66 @@
   ],
   "보넥도": [
     {
+      "time": "2026-05-19 01:53",
+      "source": "이미지 자세 분석",
+      "score": 7.5,
+      "risk": "주의",
+      "good": 3,
+      "total": 4,
+      "missing_items": [],
+      "image_path": "E:\\python\\Jasee\\history_images\\보넥도_20260519_0153_700885.png"
+    },
+    {
+      "time": "2026-05-18 22:04",
+      "source": "이미지 자세 분석",
+      "score": 2.9,
+      "risk": "위험",
+      "good": 2,
+      "total": 7,
+      "missing_items": [],
+      "image_path": "E:\\python\\Jasee\\history_images\\보넥도_20260518_2204_567122.png"
+    },
+    {
+      "time": "2026-05-18 21:53",
+      "source": "이미지 자세 분석",
+      "score": 5.0,
+      "risk": "위험",
+      "good": 2,
+      "total": 4,
+      "missing_items": [],
+      "image_path": "E:\\python\\Jasee\\history_images\\보넥도_20260518_2153_287805.png"
+    },
+    {
+      "time": "2026-05-18 21:51",
+      "source": "이미지 자세 분석",
+      "score": 2.9,
+      "risk": "위험",
+      "good": 2,
+      "total": 7,
+      "missing_items": [],
+      "image_path": "E:\\python\\Jasee\\history_images\\보넥도_20260518_2151_242077.png"
+    },
+    {
+      "time": "2026-05-18 21:46",
+      "source": "이미지 자세 분석",
+      "score": 2.9,
+      "risk": "위험",
+      "good": 2,
+      "total": 7,
+      "missing_items": [],
+      "image_path": "E:\\python\\Jasee\\history_images\\보넥도_20260518_2146_160071.png"
+    },
+    {
+      "time": "2026-05-18 21:25",
+      "source": "이미지 자세 분석",
+      "score": 5.0,
+      "risk": "위험",
+      "good": 2,
+      "total": 4,
+      "missing_items": [],
+      "image_path": "E:\\python\\Jasee\\history_images\\보넥도_20260518_2125_619180.png"
+    },
+    {
       "time": "2026-05-18 17:57",
       "source": "이미지 자세 분석",
       "score": 5.0,
