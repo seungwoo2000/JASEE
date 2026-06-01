@@ -1,0 +1,913 @@
+[
+  {
+    "chunk_id": "F2_QA_F2_SCORE_001",
+    "source_file": "function2_qa.json",
+    "doc_type": "QA",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": "1-2",
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "질문: 제 RULA 점수가 1~2점 나왔어요. 어떤 의미인가요?\n답변: ✓ RULA 점수 1~2점 — 위험 낮음 (조치 불필요)\n\n현재 자세는 근골격계 질환 위험이 매우 낮은 안전한 상태입니다. 상체(팔·손목)와 목·몸통 모두 인체공학적으로 적합한 자세를 유지하고 있습니다.\n\n이 상태를 유지하려면:\n• 1시간 작업 후 5~10분 스트레칭을 병행하세요 (VDT 고시 제4조)\n• 현재 모니터·의자·책상 위치를 그대로 유지하세요\n• 정기적으로 자세를 재분석하여 변화를 추적하세요",
+    "char_count": 266
+  },
+  {
+    "chunk_id": "F2_QA_F2_SCORE_002",
+    "source_file": "function2_qa.json",
+    "doc_type": "QA",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": "3-4",
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "질문: RULA 점수 3~4점이 나왔어요. 괜찮은 건가요?\n답변: ⚠ RULA 점수 3~4점 — 낮은 위험 (변경 고려)\n\n현재 자세에 경미한 위험 요인이 있습니다. 즉각적인 위험은 아니지만 장시간 지속되면 근골격계 부담이 누적될 수 있습니다.\n\n권고 조치:\n① 어떤 지표가 점수를 높이는지 부위별 분석 결과를 확인하세요\n② 가장 점수가 높은 부위(목·손목·허리 중)부터 우선 교정하세요\n③ 작업 자세 변경 또는 작업환경 조정을 검토하세요\n④ 1시간 이상 같은 자세를 유지하지 않도록 하세요",
+    "char_count": 274
+  },
+  {
+    "chunk_id": "F2_QA_F2_SCORE_003",
+    "source_file": "function2_qa.json",
+    "doc_type": "QA",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": "5-6",
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "질문: RULA 점수가 5~6점 나왔어요. 심각한 건가요?\n답변: ⚠⚠ RULA 점수 5~6점 — 중간 위험 (빠른 변경 필요)\n\n현재 자세는 근골격계 질환 발생 위험이 있는 상태입니다. 빠른 시일 내에 작업자세와 환경을 개선해야 합니다.\n\n즉시 확인해야 할 항목:\n① 목굴곡각(CVA): 20° 초과 시 모니터 높이 조정 필요\n② 몸통굴곡각(TIA): 20° 초과 시 등받이에 기대도록 교정\n③ 손목: ±15° 초과 시 손목 받침대 사용\n④ 팔꿈치: 90° 미만 시 의자 높이 또는 책상 높이 조정\n\n부위별 분석 결과를 확인하고 점수가 높은 항목부터 순서대로 교정하세요.",
+    "char_count": 320
+  },
+  {
+    "chunk_id": "F2_QA_F2_SCORE_004",
+    "source_file": "function2_qa.json",
+    "doc_type": "QA",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": "7+",
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "질문: RULA 점수 7점 이상이 나왔어요. 어떻게 해야 하나요?\n답변: 🔴 RULA 점수 7점 이상 — 매우 높은 위험 (즉시 변경 필요)\n\n현재 자세는 근골격계 질환 발생 위험이 매우 높은 상태입니다. 지금 즉시 자세와 작업환경을 교정해야 합니다.\n\n즉시 해야 할 것:\n① 지금 당장 의자 깊숙이 앉아 등받이에 기대세요\n② 모니터를 눈높이에 맞게 조정하세요 (수평 하방 10~15°)\n③ 팔꿈치가 책상면과 수평이 되도록 의자 높이를 조정하세요\n④ 손목 받침대를 즉시 설치하세요\n\n⚠ 이 상태가 지속되면 경추·요추·손목 관련 근골격계 질환으로 이어질 수 있습니다. 부위별 교정 피드백을 반드시 확인하고 순서대로 개선하세요.",
+    "char_count": 349
+  },
+  {
+    "chunk_id": "F2_QA_F2_NECK_SCORE_001",
+    "source_file": "function2_qa.json",
+    "doc_type": "QA",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "질문: 목(경추) 점수가 높게 나왔어요. 무슨 문제인가요?\n답변: ⚠ 경추(목) 점수가 기준을 초과했습니다 (RULA Neck Zone 2~3)\n\n목굴곡각(CVA)이 20°를 초과하여 전방두부자세(FHP)가 감지되었습니다. 이 상태에서는 경추에 가해지는 하중이 정상 대비 2~3배 증가합니다.\n\n원인과 교정 방법:\n• 원인: 모니터가 너무 낮거나 멀리 있어 고개를 앞으로 내밀게 됨\n• 교정 ①: 모니터 상단을 눈높이와 일치하도록 높이세요 (VDT 고시 제6조 1항)\n• 교정 ②: 화면과 눈 거리를 40cm 이상 확보하세요\n• 교정 ③: 1시간마다 목을 좌우로 5회 부드럽게 돌리세요\n\n방치 시 위험: 경추 디스크 압박, 두통, 어깨 방사통 유발 가능",
+    "char_count": 365
+  },
+  {
+    "chunk_id": "F2_QA_F2_TRUNK_SCORE_001",
+    "source_file": "function2_qa.json",
+    "doc_type": "QA",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "질문: 몸통(요추) 점수가 높은데 어떤 문제인가요?\n답변: ⚠ 요추(허리) 점수가 기준을 초과했습니다 (RULA Trunk Zone 2~3)\n\n몸통굴곡각(TIA)이 20°를 초과하여 과도한 전굴 자세가 감지되었습니다. 요추 추간판에 지속적인 압박이 가해지는 상태입니다.\n\n원인과 교정 방법:\n• 원인 ①: 의자 등받이를 사용하지 않고 앞쪽으로 앉음\n• 원인 ②: 모니터가 너무 멀거나 낮아 몸을 앞으로 숙임\n• 교정 ①: 의자 깊숙이 앉아 등받이에 허리를 완전히 기대세요 (VDT 고시 제6조 4항)\n• 교정 ②: 요추 쿠션을 등받이와 허리 사이에 놓으세요\n• 교정 ③: 모니터를 몸 가까이 당기거나 높이를 조정하세요\n\n방치 시 위험: 요추 디스크 탈출증, 만성 요통 유발 가능",
+    "char_count": 379
+  },
+  {
+    "chunk_id": "F2_QA_F2_WRIST_SCORE_001",
+    "source_file": "function2_qa.json",
+    "doc_type": "QA",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": "1-2",
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "질문: 손목 점수가 높게 나왔어요. 왜 그런 건가요?\n답변: ⚠ 손목 점수가 기준을 초과했습니다 (RULA Wrist Zone 1~2)\n\n손목 굴곡 또는 신전 각도가 ±15°를 초과하거나 손목이 비틀린 상태가 감지되었습니다. 반복 작업 시 손목건초염(CTS) 발생 위험이 증가합니다.\n\n원인과 교정 방법:\n• 원인 ①: 키보드가 너무 높거나 낮아 손목이 꺾임\n• 원인 ②: 손목 받침대 없이 장시간 키보드·마우스 사용\n• 교정 ①: 손목 받침대(Wrist Pad)를 키보드 앞에 설치하세요 (VDT 고시 제5조 2항 7호)\n• 교정 ②: 키보드와 책상 앞면 사이 15cm 이상 공간을 확보하세요\n• 교정 ③: 팔꿈치 내각 90° 이상 유지로 손목 중립 자세를 잡으세요\n\n방치 시 위험: 손목건초염(CTS), 건초염, 손가락 저림 유발 가능\n*손목건초염: 손목 힘줄을 감싸는 막에 염증이 생겨 손이나 엄지손가락을 움직일 때마다 통증이 발생하는 질환",
+    "char_count": 473
+  },
+  {
+    "chunk_id": "F2_QA_F2_UPPER_ARM_SCORE_001",
+    "source_file": "function2_qa.json",
+    "doc_type": "QA",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": "7+",
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "질문: 팔꿈치 점수가 높은 이유가 뭔가요?\n답변: ⚠ 팔꿈치(윗팔) 점수가 기준을 초과했습니다 (RULA Upper Arm Zone 2~3)\n\n팔꿈치 내각이 90° 미만이거나 120°를 초과하여 윗팔이 과도하게 올라가거나 내려간 상태입니다.\n\n원인과 교정 방법:\n• 원인 ①: 책상이 너무 높아 어깨가 으쓱 올라감 (Zone 3)\n• 원인 ②: 책상이 너무 낮아 팔이 과하게 내려감 (Zone 2)\n• 교정 ①: 팔꿈치가 책상면과 수평이 되도록 의자 높이를 조정하세요\n• 교정 ②: 책상 높이 기준 60~70cm (고정형) 또는 65cm 전후 (조절형) 확인\n• 교정 ③: 어깨가 자연스럽게 내려뜨려진 상태에서 팔꿈치 내각 90° 이상 유지 (VDT 고시 제6조 2항)\n\n방치 시 위험: 어깨 충돌 증후군, 팔꿈치 관절염 위험 증가",
+    "char_count": 409
+  },
+  {
+    "chunk_id": "F2_QA_F2_SCORE_CHANGE_001",
+    "source_file": "function2_qa.json",
+    "doc_type": "QA",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "질문: 지난번보다 RULA 점수가 올라갔어요. 왜 그런 건가요?\n답변: ⚠ RULA 점수가 이전 분석보다 상승했습니다\n\n자세 위험도가 높아진 상태입니다. 주로 아래 원인 중 하나입니다.\n\n점수 상승의 주요 원인:\n① 의자·모니터·키보드 위치가 바뀌었거나\n② 작업 시간이 길어져 피로 누적으로 자세가 무너졌거나\n③ 새로운 작업(자료 입력, 화상회의 등)으로 자세 패턴이 변경됨\n\n확인 방법:\n• 부위별 점수를 이전과 비교하여 어느 지표가 올랐는지 확인하세요\n• 점수가 올라간 지표의 교정 피드백을 우선 확인하세요\n• 작업 환경이 변경되었다면 환경 재설정 후 재분석하세요",
+    "char_count": 317
+  },
+  {
+    "chunk_id": "F2_QA_F2_MUSCLE_SCORE_001",
+    "source_file": "function2_qa.json",
+    "doc_type": "QA",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "질문: 근육 사용 점수가 추가됐는데 이게 뭔가요?\n답변: 근육 사용 가산점(+1)이란?\n\nRULA 평가에서 자세를 10분 이상 정적으로 유지하거나, 같은 동작을 1분에 4회 이상 반복할 때 +1점이 가산됩니다.\n\n이 점수가 추가된 이유:\n• 장시간 같은 자세로 고정된 작업을 하고 있거나\n• 타이핑·마우스 클릭 등 반복 동작이 많은 상태입니다\n\n개선 방법:\n① 매 1시간마다 5분 이상 자리에서 일어나 걸어보세요\n② 작업 중 스트레칭을 주기적으로 하세요\n③ 가능하면 업무 중간에 다른 종류의 작업을 섞어서 자세 변화를 주세요 (VDT 고시 제4조 1항)",
+    "char_count": 309
+  },
+  {
+    "chunk_id": "F2_QA_F2_GROUP_A_001",
+    "source_file": "function2_qa.json",
+    "doc_type": "QA",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": "7+",
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "질문: 그룹 A 점수(팔·손목)와 그룹 B 점수(목·몸통)가 뭔가요?\n답변: RULA는 크게 두 그룹으로 나뉘어 평가됩니다.\n\n그룹 A — 팔·손목 분석 (Steps 1~8)\n• 평가 항목: 윗팔 위치 → 아래팔 위치 → 손목 굴곡 → 손목 비틀림\n• 자세히봐 서비스 연결 지표: 팔꿈치 각도, 손목 각도, 작업대 높이\n• 위험 시: 팔꿈치·손목·어깨 관련 근골격계 질환 위험 증가\n\n그룹 B — 목·몸통·다리 분석 (Steps 9~15)\n• 평가 항목: 목 위치 → 몸통 위치 → 다리 지지 상태\n• 자세히봐 서비스 연결 지표: CVA(목굴곡각), TIA(몸통굴곡각), 무릎 각도, 의자-등받이 거리\n• 위험 시: 경추·요추 디스크, 허리 통증 위험 증가\n\n두 그룹의 점수를 Table C에서 교차하여 최종 RULA 점수(1~7+)를 산출합니다.",
+    "char_count": 418
+  },
+  {
+    "chunk_id": "F2_QA_F2_SCORE_IMPROVE_001",
+    "source_file": "function2_qa.json",
+    "doc_type": "QA",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "질문: RULA 점수를 낮추려면 어떻게 해야 하나요?\n답변: RULA 점수를 낮추는 가장 효과적인 방법은 점수가 높은 지표부터 우선 교정하는 것입니다.\n\n교정 우선순위 (점수 기여도 높은 순):\n\n1순위 — 목굴곡각(CVA) 교정\n→ 모니터 높이를 눈높이에 맞게 조정 (가장 빠른 효과)\n\n2순위 — 몸통굴곡각(TIA) 교정\n→ 의자 깊숙이 앉아 등받이에 기대기\n\n3순위 — 팔꿈치 각도 교정\n→ 의자 높이 조정으로 팔꿈치 90° 이상 유지\n\n4순위 — 손목 각도 교정\n→ 손목 받침대 설치, 키보드 위치 조정\n\n5순위 — 의자·책상 환경 전체 점검\n→ VDT 고시 체크리스트 항목 순서대로 확인\n\n환경 교정 후 재분석하면 일반적으로 2~3점 감소 효과를 기대할 수 있습니다.",
+    "char_count": 378
+  },
+  {
+    "chunk_id": "F2_QA_F2_ZONE_EXPLAIN_001",
+    "source_file": "function2_qa.json",
+    "doc_type": "QA",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "질문: RULA Zone이 뭔가요? Zone 0, 1, 2, 3이 어떻게 다른가요?\n답변: RULA Zone은 각 신체 부위의 자세 위험도를 0~3단계로 구분한 것입니다.\n\nZone 0 — 중립 자세 (위험 없음)\n예) 목 굴곡 0~10°, 몸통 직립 0~10°\n\nZone 1 — 경미한 이탈 (주의)\n예) 목 굴곡 10~20°, 팔꿈치 약간 올라간 상태\n\nZone 2 — 유의미한 이탈 (개선 필요)\n예) 목 굴곡 20° 초과, 몸통 20~60° 전굴\n→ 자세히봐 서비스에서 Bad로 판정되는 기준\n\nZone 3 — 심각한 이탈 (즉시 교정 필요)\n예) 목이 비틀리거나 심하게 기울어진 경우, 몸통 60° 이상 전굴\n\n자세히봐 서비스는 RULA Zone 0~1을 Good, Zone 2~3을 Bad로 이진 분류하여 판정합니다.",
+    "char_count": 407
+  },
+  {
+    "chunk_id": "F2_QA_F2_SCORE_NA_001",
+    "source_file": "function2_qa.json",
+    "doc_type": "QA",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "질문: 일부 지표가 N/A로 나왔어요. 왜 그런 건가요?\n답변: N/A는 해당 지표를 신뢰할 수 있는 정확도로 측정하지 못한 경우 표시됩니다.\n\n주요 원인:\n① 랜드마크 신뢰도(visibility)가 0.40 미만으로 신체 일부가 가려진 경우\n② 측면 촬영이 아닌 정면 또는 비스듬한 각도로 촬영된 경우\n③ 모니터나 책상이 화면에 보이지 않아 환경 지표 측정 불가\n\n해결 방법:\n① 측면에서 전신이 보이도록 카메라 위치를 조정하세요\n② 모니터·의자·책상이 모두 화면에 포함되도록 촬영하세요\n③ 조명이 충분한 환경에서 재촬영하세요\n\nN/A 지표가 3개 이상이면 분석 결과의 신뢰도가 낮아질 수 있으니 재촬영을 권장합니다.",
+    "char_count": 346
+  },
+  {
+    "chunk_id": "F2_QA_F2_RISK_SCORE_001",
+    "source_file": "function2_qa.json",
+    "doc_type": "QA",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": "1-2",
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "질문: 리스크 스코어가 뭔가요? RULA 점수랑 다른 건가요?\n답변: 리스크 스코어와 RULA 점수의 차이\n\nRULA 점수 (1~7+)\n• 정수로 표현되는 위험 등급\n• 1~2: 낮음 / 3~4: 주의 / 5~6: 중간 / 7+: 높음\n• 신체 부위별 각도를 테이블에서 교차하여 산출\n\n리스크 스코어 (0.0~1.0)\n• 소수점으로 표현되는 연속적 위험 수치\n• 경계값(예: CVA 20°)에서 급격히 변화하는 시그모이드 함수 적용\n• 0.5 미만: 안전 구간 / 0.5 이상: 위험 구간\n• 예) CVA 25° → 리스크 스코어 0.72 (위험 구간)\n\n자세히봐 서비스는 두 지표를 함께 제공하여 이진(Good/Bad) 판정과 연속적 위험 수치를 모두 확인할 수 있습니다.",
+    "char_count": 377
+  },
+  {
+    "chunk_id": "F2_SCORE_TABLE_0",
+    "source_file": "function2_rula_body_mapping.json",
+    "doc_type": "매핑",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": "1-2",
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "RULA 최종 점수 기준표 - 점수대: 1~2, 위험수준: 낮음, 조치 요구사항: 조치 불필요 (출력 색상: green)",
+    "char_count": 67
+  },
+  {
+    "chunk_id": "F2_SCORE_TABLE_1",
+    "source_file": "function2_rula_body_mapping.json",
+    "doc_type": "매핑",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": "3-4",
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "RULA 최종 점수 기준표 - 점수대: 3~4, 위험수준: 낮은 위험, 조치 요구사항: 변경 고려 (출력 색상: yellow)",
+    "char_count": 70
+  },
+  {
+    "chunk_id": "F2_SCORE_TABLE_2",
+    "source_file": "function2_rula_body_mapping.json",
+    "doc_type": "매핑",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": "5-6",
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "RULA 최종 점수 기준표 - 점수대: 5~6, 위험수준: 중간 위험, 조치 요구사항: 빠른 변경 필요 (출력 색상: orange)",
+    "char_count": 73
+  },
+  {
+    "chunk_id": "F2_SCORE_TABLE_3",
+    "source_file": "function2_rula_body_mapping.json",
+    "doc_type": "매핑",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": "7+",
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "RULA 최종 점수 기준표 - 점수대: 7+, 위험수준: 매우 높음, 조치 요구사항: 즉시 변경 필요 (출력 색상: red)",
+    "char_count": 69
+  },
+  {
+    "chunk_id": "F2_BODY_MAP_0",
+    "source_file": "function2_rula_body_mapping.json",
+    "doc_type": "매핑",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "RULA 신체 부위 점수 매핑 - 분석 부위: 경추(목), RULA 항목: Neck, 연계 서비스 지표: CVA (목굴곡각), 판정 기준 리스트: [{'zone': 0, 'range': '0~10°', 'result': 'Good', 'korean': '중립 자세'}, {'zone': 1, 'range': '10~20°', 'result': 'Good', 'korean': '경미한 기울임'}, {'zone': 2, 'range': '20° 초과', 'result': 'Bad', 'korean': '전방두부자세(FHP)'}, {'zone': 3, 'range': '20° 초과 + 비틀림', 'result': 'Bad', 'korean': '심각한 경추 부하'}]",
+    "char_count": 373
+  },
+  {
+    "chunk_id": "F2_BODY_MAP_1",
+    "source_file": "function2_rula_body_mapping.json",
+    "doc_type": "매핑",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "요추"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "RULA 신체 부위 점수 매핑 - 분석 부위: 요추(허리), RULA 항목: Trunk, 연계 서비스 지표: TIA (몸통굴곡각), 판정 기준 리스트: [{'zone': 0, 'range': '0~10°', 'result': 'Good', 'korean': '직립 자세'}, {'zone': 1, 'range': '0~20°', 'result': 'Good', 'korean': '약간의 전굴'}, {'zone': 2, 'range': '21~60°', 'result': 'Bad', 'korean': '과도한 전굴'}, {'zone': 3, 'range': '60° 초과', 'result': 'Bad', 'korean': '심각한 전굴'}]",
+    "char_count": 360
+  },
+  {
+    "chunk_id": "F2_BODY_MAP_2",
+    "source_file": "function2_rula_body_mapping.json",
+    "doc_type": "매핑",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "RULA 신체 부위 점수 매핑 - 분석 부위: 손목, RULA 항목: Wrist, 연계 서비스 지표: 손목각도, 판정 기준 리스트: [{'zone': 0, 'range': '중립 (±0°)', 'result': 'Good', 'korean': '중립 자세'}, {'zone': 1, 'range': '±15° 이내', 'result': 'Good', 'korean': '경미한 굴곡'}, {'zone': 2, 'range': '±15° 초과 또는 비틀림', 'result': 'Bad', 'korean': '과도한 굴곡/신전'}]",
+    "char_count": 296
+  },
+  {
+    "chunk_id": "F2_BODY_MAP_3",
+    "source_file": "function2_rula_body_mapping.json",
+    "doc_type": "매핑",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "손목"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "RULA 신체 부위 점수 매핑 - 분석 부위: 어깨/팔꿈치, RULA 항목: Upper Arm, 연계 서비스 지표: 팔꿈치각도, 판정 기준 리스트: [{'zone': 0, 'range': '-20° ~ 20°', 'result': 'Good', 'korean': '자연스러운 하수'}, {'zone': 1, 'range': '20~45° 또는 -20~0°', 'result': 'Good', 'korean': '약간 올라가거나 뒤로'}, {'zone': 2, 'range': '45~90°', 'result': 'Bad', 'korean': '과도하게 올라간 상태'}, {'zone': 3, 'range': '90° 초과', 'result': 'Bad', 'korean': '심각하게 올라간 상태'}]",
+    "char_count": 392
+  },
+  {
+    "chunk_id": "F2_BODY_MAP_4",
+    "source_file": "function2_rula_body_mapping.json",
+    "doc_type": "매핑",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "전신"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "RULA 신체 부위 점수 매핑 - 분석 부위: 무릎/하지, RULA 항목: Legs, 연계 서비스 지표: 무릎각도, 판정 기준 리스트: [{'zone': 0, 'range': '발과 다리가 지지된 상태', 'result': 'Good', 'korean': '안정적 하체'}, {'zone': 1, 'range': '미지지 상태', 'result': 'Bad', 'korean': '하체 불안정'}]",
+    "char_count": 222
+  },
+  {
+    "chunk_id": "F2_CALC_FLOW_group_a",
+    "source_file": "function2_rula_body_mapping.json",
+    "doc_type": "매핑",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "RULA 계산 단계 흐름 - 그룹: 팔·손목 분석 (group_a), 계산 절차: Step 1: 윗팔 위치 점수 -> Step 2: 아래팔 위치 점수 -> Step 3: 손목 굴곡 점수 -> Step 4: 손목 비틀림 점수 -> Step 5: Table A에서 그룹A 자세 점수 산출 -> Step 6: 근육 사용 가산점 (+1 또는 0) -> Step 7: 하중/힘 가산점 (0~+3) -> Step 8: 팔·손목 최종 점수 (Steps 5+6+7), 관련된 자세 지표: 팔꿈치각도, 손목각도, 작업대 높이",
+    "char_count": 284
+  },
+  {
+    "chunk_id": "F2_CALC_FLOW_group_b",
+    "source_file": "function2_rula_body_mapping.json",
+    "doc_type": "매핑",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "RULA 계산 단계 흐름 - 그룹: 목·몸통·다리 분석 (group_b), 계산 절차: Step 9: 목 위치 점수 -> Step 10: 몸통 위치 점수 -> Step 11: 다리 지지 상태 점수 -> Step 12: Table B에서 그룹B 자세 점수 산출 -> Step 13: 근육 사용 가산점 (+1 또는 0) -> Step 14: 하중/힘 가산점 (0~+3) -> Step 15: 목·몸통·다리 최종 점수 (Steps 12+13+14), 관련된 자세 지표: CVA(목굴곡각), TIA(몸통굴곡각), 무릎각도, 의자-등받이 거리",
+    "char_count": 298
+  },
+  {
+    "chunk_id": "F2_CALC_FLOW_final",
+    "source_file": "function2_rula_body_mapping.json",
+    "doc_type": "매핑",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "RULA 최종 점수 계산 단계 흐름 - final: Table C: 그룹A 점수(행) × 그룹B 점수(열) → 최종 RULA 점수(1~7+)",
+    "char_count": 78
+  },
+  {
+    "chunk_id": "POSE_STANDARDS_CVA",
+    "source_file": "fit me up_ 최종 자세기준서.docx",
+    "doc_type": "자세기준",
+    "function": [
+      "기능1",
+      "기능2"
+    ],
+    "body_part": [
+      "경추"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "CVA",
+    "content": "=== Jasee 자세분석기준 - 목굴곡각 (CVA) ===\n자세 지표명: 목굴곡각 (CVA) (태그: CVA)\n• 올바른 자세 (Good 기준): 0° ~ 20° (RULA Zone 0~1)머리-경추-어깨가 일직선에 가까운 상태\n• 잘못된 자세 (Bad 기준): 20° 초과 (RULA Zone 2~3)전방두부자세(FHP) 의심\n• RULA 평가 근거: RULA Neck Zone: 0(0~10°), 1(11~20°), 2(21°+), 3(굴곡+비틀림)\n• VDT 고시 기준: VDT 고시 제6조 1항: 화면상단-눈높이 일치, 시야 수평 하방 10~15°\n• Good 판정 시 피드백: ✓ 목 자세가 안정적입니다 (CVA: 0~20°)\n현재 머리와 경추가 거의 수직 정렬되어 있습니다. VDT 고시 기준에 따라 화면 상단이 눈높이와 일치하거나 수평 하방 10~15° 시선 범위를 유지하고 있어 경추 추간판에 가해지는 하중이 최소화된 상태입니다. 목,어깨,팔로 이어지는 부위에 통증이나 저림, 감각 이상이 발생하는 위험을 줄여줍니다.\n• Bad 판정 시 피드백 및 교정법: ⚠ 고개가 과도하게 앞으로 기울어져 있습니다 (CVA: 25° 초과)\n→ 모니터 높이를 눈높이에 맞춰 올리거나, 의자 높이를 조정하여 화면과 눈의 시선이 수평 하방 10~15° 범위에 들어오도록 조정하세요. 1시간마다 목을 좌우로 5회씩 부드럽게 돌려주세요.",
+    "char_count": 689
+  },
+  {
+    "chunk_id": "POSE_STANDARDS_TIA",
+    "source_file": "fit me up_ 최종 자세기준서.docx",
+    "doc_type": "자세기준",
+    "function": [
+      "기능1",
+      "기능2"
+    ],
+    "body_part": [
+      "요추"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "TIA",
+    "content": "=== Jasee 자세분석기준 - 몸통굴곡각 (TIA) ===\n자세 지표명: 몸통굴곡각 (TIA) (태그: TIA)\n• 올바른 자세 (Good 기준): -20° ~ 20° (RULA Zone 0~1)척추가 수직에 근접한 상태\n• 잘못된 자세 (Bad 기준): 20° 초과 (RULA Zone 2~3)과도한 전굴/후굴\n• RULA 평가 근거: RULA Trunk Zone: 0(0~10°), 1(0~20°), 2(21~60°), 3(60°+)\n• VDT 고시 기준: VDT 고시 제6조 4항: 의자 깊숙이 앉아 등받이에 등 충분히 지지\n• Good 판정 시 피드백: ✓ 척추 자세가 올바릅니다 (TIA: 0~20°)\n현재 몸통이 거의 수직에 가깝게 유지되고 있습니다. VDT 고시 기준에 따라 의자 등받이에 등이 충분히 지지된 상태이며, 요추 압박이 최소화되어 있습니다. 장시간 좌식 근무 시에도 근골격계 부담이 낮은 최적 자세입니다.\n• Bad 판정 시 피드백 및 교정법: ⚠ 몸통이 앞으로 과도하게 굽혀져 있습니다 (TIA: 10° 초과)\n→ 의자 깊숙이 앉아 등받이에 허리를 완전히 기대세요. 모니터를 가까이 당기거나 높이를 조정하여 몸이나 고개를 앞쪽으로 숙이지않고 화면을 보세요. 등받이 요추 쿠션 사용을 권장합니다.",
+    "char_count": 629
+  },
+  {
+    "chunk_id": "POSE_STANDARDS_체간",
+    "source_file": "fit me up_ 최종 자세기준서.docx",
+    "doc_type": "자세기준",
+    "function": [
+      "기능1",
+      "기능2"
+    ],
+    "body_part": [
+      "요추"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "체간",
+    "content": "=== Jasee 자세분석기준 - 체간-책상거리 ===\n자세 지표명: 체간-책상거리 (태그: 체간)\n• 올바른 자세 (Good 기준): 어깨 X좌표 ≤ 책상 전면 X좌표 + 0.15*(어깨-골반 Y거리)신체가 책상에 지나치게 근접하지 않은 상태\n• 잘못된 자세 (Bad 기준): 어깨가 책상  전면보다 전방 0.15 비율 이상 돌출몸통이 책상 쪽으로 지나치게 숙여진 상태\n• RULA 평가 근거: RULA Trunk 전굴 가중과 연동\n• VDT 고시 기준: VDT 고시 제5조 3항: 작업대 충분한 넓이, 신체 보호 구조\n• Bad 판정 시 피드백 및 교정법: ⚠ 몸이 책상 쪽으로 지나치게 기울어져 있습니다\n→ 의자를 뒤로 당기거나 모니터 위치를 조정하세요. 의자 등받이에 충분히 기댄 상태에서도 키보드와 마우스를 편안하게 조작할 수 있어야 합니다. VDT 고시 기준 팔꿈치 내각 90° 이상 유지 여부를 함께 확인하세요.",
+    "char_count": 461
+  },
+  {
+    "chunk_id": "POSE_STANDARDS_모니터",
+    "source_file": "fit me up_ 최종 자세기준서.docx",
+    "doc_type": "자세기준",
+    "function": [
+      "기능1",
+      "기능2"
+    ],
+    "body_part": [
+      "경추"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "모니터",
+    "content": "=== Jasee 자세분석기준 - 모니터 시선각 ===\n자세 지표명: 모니터 시선각 (태그: 모니터)\n• 올바른 자세 (Good 기준): 수평 대비 하방 10° ~ 15°화면 상단이 눈높이와 일치하거나 약간 아래\n• 잘못된 자세 (Bad 기준): 0° 미만(상방 시선) 또는 15° 초과(과도한 하방)경추부 과부하 발생\n• RULA 평가 근거: RULA Neck Zone 과 연동 (상방 시선 시 Zone 3)\n• VDT 고시 기준: VDT 고시 제6조 1항 직접 근거: 수평 하방 10~15°, Eye-Screen 40cm 이상\n• Bad 판정 시 피드백 및 교정법: ⚠ 모니터 위치가 적절하지 않아 시선 각도가 범위를 벗어났습니다\n→ 모니터 상단이 눈높이와 일치하도록 높이를 조정하세요 (VDT 고시 제6조 1항). 시선이 수평 하방 10~15° 범위에 들어오는지 확인하세요. 모니터가 너무 높으면 경추가 과하게 펴지며 두통 및 목 통증이 유발됩니다.",
+    "char_count": 478
+  },
+  {
+    "chunk_id": "POSE_STANDARDS_팔꿈치",
+    "source_file": "fit me up_ 최종 자세기준서.docx",
+    "doc_type": "자세기준",
+    "function": [
+      "기능1",
+      "기능2"
+    ],
+    "body_part": [
+      "손목"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "팔꿈치",
+    "content": "=== Jasee 자세분석기준 - 팔꿈치 각도 ===\n자세 지표명: 팔꿈치 각도 (태그: 팔꿈치)\n• 올바른 자세 (Good 기준): 90° ~ 120°윗팔 자연 하수, 아래팔-손등 수평 유지\n• 잘못된 자세 (Bad 기준): 90° 미만 또는 120° 초과어깨 상승 또는 과도한 팔 신전\n• RULA 평가 근거: RULA Upper Arm: Zone 0(20°~20°), Zone 1(20°~45° 또는 -20°~0°), Zone 2(45°~90°), Zone 3(90°+)\n• VDT 고시 기준: VDT 고시 제6조 2항: 팔꿈치 내각 90° 이상, 아래팔-손등 수평\n• Good 판정 시 피드백: ✓ 팔 자세가 이상적입니다 (팔꿈치 내각: 90~120°)\n현재 윗팔이 자연스럽게 내려뜨려져 있고 팔꿈치 내각이 VDT 고시 제6조 2항 기준을 충족합니다. 어깨·팔꿈치 관절에 가해지는 부하가 최적 범위입니다. 아래팔과 손등이 수평을 이루어 손목 중립 자세도 잘 유지되고 있습니다.\n• Bad 판정 시 피드백 및 교정법: ⚠ 팔꿈치 각도가 적절하지 않습니다 (90° 미만 또는 120° 초과)\n→ 의자 높이를 조정하여 팔꿈치가 책상면과 수평이 되도록 하세요. 어깨가 으쓱 올라가 있다면 책상이 너무 높은 것입니다. 팔꿈치 내각 90° 이상을 유지하세요 (VDT 고시 제5조 4항 4호).",
+    "char_count": 665
+  },
+  {
+    "chunk_id": "POSE_STANDARDS_무릎",
+    "source_file": "fit me up_ 최종 자세기준서.docx",
+    "doc_type": "자세기준",
+    "function": [
+      "기능1",
+      "기능2"
+    ],
+    "body_part": [
+      "전신"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "무릎",
+    "content": "=== Jasee 자세분석기준 - 무릎각도 ===\n자세 지표명: 무릎각도 (태그: 무릎)\n• 올바른 자세 (Good 기준): 85° ~ 100° (약 90° 전후)종아리-대퇴부 무리 없는 상태\n• 잘못된 자세 (Bad 기준): 85° 미만 또는 100° 초과혈액순환 장애 또는 자세 불안정\n• RULA 평가 근거: RULA Legs: 지지 상태 Zone 0, 미지지 Zone 1\n• VDT 고시 기준: VDT 고시 제6조 6항: 무릎 내각 90° 전후, 종아리-의자 앞면 틈새 확보\n• Good 판정 시 피드백: ✓ 무릎 자세가 바람직합니다 (무릎 내각: 85~100°)\n무릎 내각이 VDT 고시 제6조 6항 기준인 90° 전후를 충족합니다. 종아리와 허벅지에 무리한 압력이 가해지지 않아 하지 혈액순환이 원활하게 유지되며 하체 안정성도 확보된 상태입니다.\n• Bad 판정 시 피드백 및 교정법: ⚠ 무릎 각도가 적절하지 않습니다 (85° 미만 또는 100° 초과)\n→ 의자 높이를 조절하여 무릎 내각이 90° 전후가 되도록 하세요. 발바닥이 바닥에 완전히 닿지 않는다면 발 받침대(Foot Rest)를 사용하세요 (VDT 고시 제6조 5항). 의자 앞면과 종아리 사이에 손가락 하나 정도의 틈새가 있어야 합니다.",
+    "char_count": 623
+  },
+  {
+    "chunk_id": "POSE_STANDARDS_손목",
+    "source_file": "fit me up_ 최종 자세기준서.docx",
+    "doc_type": "자세기준",
+    "function": [
+      "기능1",
+      "기능2"
+    ],
+    "body_part": [
+      "손목"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "손목",
+    "content": "=== Jasee 자세분석기준 - 손목각도 ===\n자세 지표명: 손목각도 (태그: 손목)\n• 올바른 자세 (Good 기준): 아래팔-손 각도 ±15° 이내손목 중립 자세 유지\n• 잘못된 자세 (Bad 기준): ±15° 초과 (굴곡 또는 신전)반복작업 시 CTS 위험\n• RULA 평가 근거: RULA Wrist: Zone 0(중립), Zone 1(±15°), Zone 2(±15°+비틀림)\n• VDT 고시 기준: VDT 고시 제6조 7항: 손목 바깥 꺾임 지속 금지 / 제5조 2항: 손목받침대\n• Good 판정 시 피드백: ✓ 손목이 중립 자세를 유지하고 있습니다 (±15° 이내)\n현재 아래팔과 손이 거의 일직선을 이루는 중립 자세입니다. VDT 고시 제6조 7항의 '손목 바깥 꺾임 금지' 기준을 충족합니다. 반복적인 키보드·마우스 작업에서 손목건초염(CTS) 위험이 최소화된 최적 상태입니다.\n*손목 건초염: 손목 힘줄을 감싸는 막에 염증이 생겨 손이나 엄지손가락을 움직일 때마다 통증이 발생하는 질환\n• Bad 판정 시 피드백 및 교정법: ⚠ 손목이 과도하게 굽혀져 있습니다 (±15° 초과)\n→ 손목 받침대(Wrist Pad)를 키보드 앞에 설치하고, 키보드와 책상 앞면 사이 15cm 이상의 공간을 확보하세요 (VDT 고시 제5조 2항 7호). 마우스 조작 시 손목을 들지 말고 팔 전체로 이동하는 습관을 기르세요.",
+    "char_count": 687
+  },
+  {
+    "chunk_id": "POSE_STANDARDS_작업대",
+    "source_file": "fit me up_ 최종 자세기준서.docx",
+    "doc_type": "자세기준",
+    "function": [
+      "기능1",
+      "기능2"
+    ],
+    "body_part": [
+      "손목"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "작업대",
+    "content": "=== Jasee 자세분석기준 - 작업대 높이 ===\n자세 지표명: 작업대 높이 (태그: 작업대)\n• 올바른 자세 (Good 기준): 팔꿈치 Y좌표 ≈ 책상 상면 Y좌표 (±5% 허용)팔꿈치와 책상면이 수평 정렬\n• 잘못된 자세 (Bad 기준): 책상 상면이 팔꿈치보다 10% 이상 높거나 낮음어깨 상승 또는 과도한 하수\n• RULA 평가 근거: RULA Upper Arm Zone과 연동\n• VDT 고시 기준: VDT 고시 제5조 3항: 작업대 높이 60~70cm 또는 65cm 전후 조정\n• Bad 판정 시 피드백 및 교정법: ⚠ 책상 높이가 팔꿈치 위치와 맞지 않습니다\n→ 높이 조절 가능한 작업대라면 팔꿈치 높이에 맞춰 65cm 전후로 조정하세요. 고정식 작업대라면 의자 높이로 보정하고, 발이 바닥에 닿지 않으면 발받침대를 사용하세요 (VDT 고시 제5조 3항).",
+    "char_count": 432
+  },
+  {
+    "chunk_id": "POSE_STANDARDS_등받이",
+    "source_file": "fit me up_ 최종 자세기준서.docx",
+    "doc_type": "자세기준",
+    "function": [
+      "기능1",
+      "기능2"
+    ],
+    "body_part": [
+      "요추",
+      "전신"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "등받이",
+    "content": "=== Jasee 자세분석기준 - 의자-등받이 거리 ===\n자세 지표명: 의자-등받이 거리 (태그: 등받이)\n• 올바른 자세 (Good 기준): 엉덩이 Y좌표와 등받이 추정 X좌표 차이 ≤ 골반너비의 20%등받이에 충분히 기댄 상태\n• 잘못된 자세 (Bad 기준): 엉덩이-등받이 거리 > 골반너비의 20%허리 지지 부족, 전방 돌출 착석\n• RULA 평가 근거: RULA Trunk 지지조건(+1)과 연동\n• VDT 고시 기준: VDT 고시 제5조 4항 5호: 의자 끝-등받이 깊이 38~42cm / 제6조 4항: 깊숙이 착석\n• Bad 판정 시 피드백 및 교정법: ⚠ 등받이 지지가 충분하지 않습니다\n→ 의자 깊숙이 앉아 등 전체가 등받이에 닿도록 하세요. 요추 쿠션이나 등받이 각도 조절 기능을 활용하여 요추(허리) 부위부터 어깨까지 편안하게 지지되도록 하세요 (VDT 고시 제5조 4항 3호 및 제6조 4항).",
+    "char_count": 457
+  },
+  {
+    "chunk_id": "RULA_STEP_1",
+    "source_file": "RULA-A-Step-by-Step-Guide1.pdf",
+    "doc_type": "가이드",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "손목"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "팔꿈치",
+    "content": "Step 1: Upper Arm Position Score (윗팔 위치 점수 산출)\nRULA Step 1은 윗팔(Upper Arm)의 굴곡 및 신전 각도를 평가하여 점수를 산출합니다. 기본 각도 점수 기준: 20° 신전(Extension)에서 20° 굴곡(Flexion) 범위는 +1점, 20° 초과 신전 또는 20°~45° 굴곡 범위는 +2점, 45°~90° 굴곡 범위는 +3점, 90° 초과 굴곡 범위는 +4점입니다. 추가 가산점 조정 사항: 어깨가 들린 자세(Shoulder raised)인 경우 +1점, 윗팔이 벌린 자세(Abducted)인 경우 +1점, 몸통이 앞으로 숙여지거나 아래팔이 지지되는 등으로 팔 무게를 지지하는 자세(Leaning/supporting)인 경우 -1점을 적용합니다.",
+    "char_count": 392
+  },
+  {
+    "chunk_id": "RULA_STEP_2",
+    "source_file": "RULA-A-Step-by-Step-Guide1.pdf",
+    "doc_type": "가이드",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "손목"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "팔꿈치",
+    "content": "Step 2: Lower Arm Position Score (아래팔 위치 점수 산출)\nRULA Step 2는 아래팔(Lower Arm)의 굴곡 각도를 평가합니다. 기본 각도 점수 기준: 60°~100° 굴곡 범위는 가장 이상적인 각도로서 +1점이며, 60° 미만 또는 100° 초과 굴곡 범위는 관절에 무리가 가는 자세로서 +2점을 적용합니다. 추가 조정 가산점: 아래팔이 신체의 정중선(Midline)을 가로질러 작업하거나 신체 바깥쪽(Out to side)으로 벗어난 자세인 경우 +1점을 추가합니다.",
+    "char_count": 282
+  },
+  {
+    "chunk_id": "RULA_STEP_3",
+    "source_file": "RULA-A-Step-by-Step-Guide1.pdf",
+    "doc_type": "가이드",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "손목"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "손목",
+    "content": "Step 3: Wrist Flexion/Extension Score (손목 굴곡/신전 점수 산출)\nRULA Step 3은 손목(Wrist)의 굴곡 및 신전 각도를 평가합니다. 기본 각도 점수 기준: 손목이 꺾이지 않은 중립 자세(Neutral)는 +1점, 15° 이내의 가벼운 굴곡 또는 신전 범위는 +2점, 15°를 초과하여 심하게 꺾인 자세는 +3점입니다. 추가 가산점 조정: 손목이 좌측 또는 우측으로 꺾인 편향(Radial or Ulnar deviation)이 동반된 경우 +1점을 가산합니다.",
+    "char_count": 280
+  },
+  {
+    "chunk_id": "RULA_STEP_4",
+    "source_file": "RULA-A-Step-by-Step-Guide1.pdf",
+    "doc_type": "가이드",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "손목"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "손목",
+    "content": "Step 4: Wrist Twist Score (손목 비틀림 점수 산출)\nRULA Step 4는 손목의 비틀림(Wrist Twist)을 평가합니다. 기본 점수 기준: 손목 비틀림이 거의 없이 정중 범위(Mid-range of twist)에 있는 경우 +1점이며, 손목 비틀림이 가동 범위의 끝단(At or near end of range)까지 심하게 비틀린 경우 +2점을 가산합니다.",
+    "char_count": 214
+  },
+  {
+    "chunk_id": "RULA_STEP_5",
+    "source_file": "RULA-A-Step-by-Step-Guide1.pdf",
+    "doc_type": "가이드",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "손목"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "손목",
+    "content": "Step 5: Table A Score Lookup (그룹 A 자세 점수 도출)\nRULA Step 5는 앞서 Step 1부터 Step 4까지 평가한 '윗팔', '아래팔', '손목', '손목 비틀림'의 4가지 개별 점수를 결합하여, RULA 워크시트의 'Table A'를 통해 '그룹 A (상지/팔·손목) 자세 점수'를 산출합니다. Table A의 교차 테이블을 통해 상지 전반의 인체공학적 부하를 통합 점수(1~8점)로 도출하는 핵심 절차입니다.",
+    "char_count": 249
+  },
+  {
+    "chunk_id": "RULA_STEP_6",
+    "source_file": "RULA-A-Step-by-Step-Guide1.pdf",
+    "doc_type": "가이드",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "손목"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "손목",
+    "content": "Step 6: Muscle Use Score - Group A (상지 근육 사용 가산점 적용)\nRULA Step 6은 상지(Group A)의 정적 자세 유지나 반복 동작 여부에 따른 '근육 사용 가산점'을 평가합니다. 적용 기준: 동일한 부적절 자세를 10분 이상 오랫동안 지속하는 정적 자세(Static posture)이거나, 분당 4회 이상 빈번하게 동일한 동작을 반복적으로 수행하는 반복 작업(Repetitive work)인 경우 +1점을 추가하며, 가벼운 단발성 작업인 경우에는 0점입니다.",
+    "char_count": 278
+  },
+  {
+    "chunk_id": "RULA_STEP_7",
+    "source_file": "RULA-A-Step-by-Step-Guide1.pdf",
+    "doc_type": "가이드",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "전신"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "작업대",
+    "content": "Step 7: Load/Force Score - Group A (상지 하중 및 힘 가산점 적용)\nRULA Step 7은 상지가 감당하는 무게 및 순간 충격에 따른 '하중/힘 가산점'을 적용합니다. 가산점 점수 기준: 감당하는 무게가 2kg(4.4 lbs) 미만이고 간헐적인 경우 +0점, 2kg~10kg(4.4~22 lbs) 사이의 무게를 간헐적으로 취급하는 경우 +1점, 2kg~10kg 무게를 지속적으로 들고 있거나 반복하는 경우, 또는 10kg(22 lbs) 이상의 무게를 간헐적으로 취급하는 경우 +2점, 10kg 이상의 무거운 하중을 지속적으로 들고 있거나 순간적인 급격한 힘/충격(Shock)이 가해지는 경우 +3점을 적용합니다.",
+    "char_count": 358
+  },
+  {
+    "chunk_id": "RULA_STEP_8",
+    "source_file": "RULA-A-Step-by-Step-Guide1.pdf",
+    "doc_type": "가이드",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "손목"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "손목",
+    "content": "Step 8: Wrist / Arm Score Calculation (그룹 A 상지 최종 점수 도출)\nRULA Step 8은 앞서 구한 개별 점수들을 더하여 상지(그룹 A)의 최종 결합 점수를 도출합니다. 공식: '그룹 A 최종 점수 (Wrist/Arm Score) = Step 5(Table A 자세 점수) + Step 6(근육 사용 가산점) + Step 7(하중/힘 가산점)'. 이 점수는 최종 RULA 등급을 도출하기 위해 Table C의 좌측 행 축으로 사용됩니다.",
+    "char_count": 264
+  },
+  {
+    "chunk_id": "RULA_STEP_9",
+    "source_file": "RULA-A-Step-by-Step-Guide1.pdf",
+    "doc_type": "가이드",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "CVA",
+    "content": "Step 9: Neck Position Score (목/경추 위치 점수 산출)\nRULA Step 9는 목(Neck)의 굴곡 및 신전 각도를 평가하여 점수를 산출합니다. 기본 각도 점수 기준: 0°~10° 가벼운 굴곡은 +1점, 10°~20° 굴곡은 +2점, 20° 초과 굴곡은 +3점이며, 목이 뒤로 꺾이는 신전(Extension) 상태인 경우 +4점을 적용합니다. 추가 가산점 조정 사항: 목이 좌측 또는 우측으로 비틀린 자세(Twisted)인 경우 +1점, 목이 옆으로 기울어진 측굴 자세(Side-bending)인 경우 +1점을 추가합니다.",
+    "char_count": 305
+  },
+  {
+    "chunk_id": "RULA_STEP_10",
+    "source_file": "RULA-A-Step-by-Step-Guide1.pdf",
+    "doc_type": "가이드",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "요추"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "TIA",
+    "content": "Step 10: Trunk Position Score (몸통/요추 위치 점수 산출)\nRULA Step 10은 몸통(Trunk)의 굴곡 각도를 평가합니다. 기본 각도 점수 기준: 바르게 서거나 지원되어 깊숙이 앉은 0°의 정렬 상태는 +1점, 0°~20° 굴곡은 +2점, 20°~60° 굴곡은 +3점, 60°를 초과하여 심하게 구부린 자세는 +4점입니다. 추가 가산점 조정 사항: 몸통이 좌측/우측으로 비틀린 자세(Twisted)인 경우 +1점, 몸통이 옆으로 기울어진 측굴 자세(Side-bending)인 경우 +1점을 가산합니다.",
+    "char_count": 297
+  },
+  {
+    "chunk_id": "RULA_STEP_11",
+    "source_file": "RULA-A-Step-by-Step-Guide1.pdf",
+    "doc_type": "가이드",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "전신"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "무릎",
+    "content": "Step 11: Legs Score (다리 점수 산출)\nRULA Step 11은 다리와 발의 지지 상태 및 체중 균형 분배를 평가합니다. 기본 점수 기준: 앉거나 서 있을 때 양쪽 다리와 발바닥이 지면에 단단히 지지되어 대칭적으로 균형을 이루는 경우 +1점이며, 한쪽 발만 닿거나, 다리가 대칭적으로 균형 있게 지지되지 못하는 자세(Not supported / unevenly balanced)인 경우 +2점을 적용합니다.",
+    "char_count": 236
+  },
+  {
+    "chunk_id": "RULA_STEP_12",
+    "source_file": "RULA-A-Step-by-Step-Guide1.pdf",
+    "doc_type": "가이드",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "CVA",
+    "content": "Step 12: Table B Score Lookup (그룹 B 자세 점수 도출)\nRULA Step 12는 앞서 Step 9부터 Step 11까지 구한 '목', '몸통', '다리' 점수를 결합하여, RULA 워크시트의 'Table B'를 통해 '그룹 B (경추·요추·다리) 자세 점수'를 도출합니다. 목과 몸통, 하지 전반의 정렬 부조화를 통합 테이블을 통해 결합 점수(1~9점)로 변환하는 절차입니다.",
+    "char_count": 225
+  },
+  {
+    "chunk_id": "RULA_STEP_13",
+    "source_file": "RULA-A-Step-by-Step-Guide1.pdf",
+    "doc_type": "가이드",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "요추"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "TIA",
+    "content": "Step 13: Muscle Use Score - Group B (목·몸통 근육 사용 가산점 적용)\nRULA Step 13은 목, 몸통, 하지(Group B)의 정적 자세 유지나 반복적인 움직임에 따른 '근육 사용 가산점'을 평가합니다. 적용 기준: 부적절한 목·몸통 자세를 10분 이상 계속 유지하는 정적 자세이거나, 분당 4회 이상 동일한 목·몸통 움직임을 빈번하게 반복적으로 움직이는 경우 +1점을 가산하고, 그렇지 않으면 0점입니다.",
+    "char_count": 246
+  },
+  {
+    "chunk_id": "RULA_STEP_14",
+    "source_file": "RULA-A-Step-by-Step-Guide1.pdf",
+    "doc_type": "가이드",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "전신"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "작업대",
+    "content": "Step 14: Load/Force Score - Group B (목·몸통 하중 및 힘 가산점 적용)\nRULA Step 14는 목, 몸통, 하지가 감당하는 무게 및 순간 충격에 따른 '하중/힘 가산점'을 적용합니다. 가산점 점수 기준: 하중이 2kg 미만이고 간헐적인 경우 +0점, 2kg~10kg 사이를 간헐적으로 감당하는 경우 +1점, 2kg~10kg 사이를 지속적으로 부담하거나 반복하는 경우, 또는 10kg 이상을 간헐적으로 가하는 경우 +2점, 10kg 이상의 무거운 하중을 목/몸통에 지속적으로 가하거나 충격이 동반되는 경우 +3점을 가산합니다.",
+    "char_count": 311
+  },
+  {
+    "chunk_id": "RULA_STEP_15",
+    "source_file": "RULA-A-Step-by-Step-Guide1.pdf",
+    "doc_type": "가이드",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추"
+    ],
+    "rula_score_range": null,
+    "tia_angle": null,
+    "posture_indicator": "CVA",
+    "content": "Step 15: Neck, Trunk, & Leg Score Calculation (그룹 B 최종 점수 도출)\nRULA Step 15는 앞서 구한 개별 점수들을 더하여 목·몸통·하지(그룹 B)의 최종 점수를 도출합니다. 공식: '그룹 B 최종 점수 (Neck, Trunk, & Leg Score) = Step 12(Table B 자세 점수) + Step 13(근육 사용 가산점) + Step 14(하중/힘 가산점)'. 이 점수는 최종 RULA 위험도를 도출하기 위해 Table C의 상단 열 축으로 사용됩니다.",
+    "char_count": 285
+  },
+  {
+    "chunk_id": "RULA_ACTION_LEVEL_TABLE",
+    "source_file": "RULA-A-Step-by-Step-Guide1.pdf",
+    "doc_type": "가이드",
+    "function": [
+      "기능2"
+    ],
+    "body_part": [
+      "경추",
+      "요추",
+      "손목",
+      "전신"
+    ],
+    "rula_score_range": "1-2",
+    "tia_angle": null,
+    "posture_indicator": null,
+    "content": "RULA 최종 점수 및 액션 레벨(Action Level)에 따른 위험 수준 안내:\n• 1-2점 (Action Level 1): 위험 수준 매우 낮음 (안전함). 자세 교정이 불필요하며 현재의 올바른 작업 환경과 자세를 유지합니다.\n• 3-4점 (Action Level 2): 위험 수준 낮음. 신체 정렬 분석 후 작업 기기나 의자 높이의 가벼운 변경을 고려하는 것이 좋습니다.\n• 5-6점 (Action Level 3): 위험 수준 보통 (중간 위험). 인체공학적 조치가 조속히 필요하며, 작업 환경 및 자세 교정을 권고합니다.\n• 7점 이상 (Action Level 4): 위험 수준 매우 높음. 근골격계 질환의 직접적인 원인이 되므로, 즉각적인 조치 및 작업 자세의 공학적 개선이 시급히 요구됩니다.",
+    "char_count": 394
+  }
+]

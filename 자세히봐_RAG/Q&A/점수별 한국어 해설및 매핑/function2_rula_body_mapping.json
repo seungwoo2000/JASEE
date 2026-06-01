@@ -1,0 +1,109 @@
+{
+  "rula_score_table": [
+    {"score": "1~2", "risk_level": "낮음", "action": "조치 불필요", "color": "green"},
+    {"score": "3~4", "risk_level": "낮은 위험", "action": "변경 고려", "color": "yellow"},
+    {"score": "5~6", "risk_level": "중간 위험", "action": "빠른 변경 필요", "color": "orange"},
+    {"score": "7+", "risk_level": "매우 높음", "action": "즉시 변경 필요", "color": "red"}
+  ],
+
+  "body_part_score_mapping": [
+    {
+      "body_part": "경추(목)",
+      "rula_component": "Neck",
+      "service_indicator": "CVA (목굴곡각)",
+      "zone_criteria": [
+        {"zone": 0, "range": "0~10°", "result": "Good", "korean": "중립 자세"},
+        {"zone": 1, "range": "10~20°", "result": "Good", "korean": "경미한 기울임"},
+        {"zone": 2, "range": "20° 초과", "result": "Bad", "korean": "전방두부자세(FHP)"},
+        {"zone": 3, "range": "20° 초과 + 비틀림", "result": "Bad", "korean": "심각한 경추 부하"}
+      ],
+      "adjustment": "목이 비틀린 경우 +1, 목이 옆으로 기운 경우 +1",
+      "disease_risk": "경추 디스크 압박, 두통, 어깨 방사통",
+      "correction": "모니터 높이를 눈높이에 맞게 조정 (VDT 고시 제6조 1항)"
+    },
+    {
+      "body_part": "요추(허리)",
+      "rula_component": "Trunk",
+      "service_indicator": "TIA (몸통굴곡각)",
+      "zone_criteria": [
+        {"zone": 0, "range": "0~10°", "result": "Good", "korean": "직립 자세"},
+        {"zone": 1, "range": "0~20°", "result": "Good", "korean": "약간의 전굴"},
+        {"zone": 2, "range": "21~60°", "result": "Bad", "korean": "과도한 전굴"},
+        {"zone": 3, "range": "60° 초과", "result": "Bad", "korean": "심각한 전굴"}
+      ],
+      "adjustment": "몸통이 비틀린 경우 +1, 몸통이 옆으로 기운 경우 +1",
+      "disease_risk": "요추 디스크 탈출증, 만성 요통",
+      "correction": "의자 깊숙이 앉아 등받이에 기대기 (VDT 고시 제6조 4항)"
+    },
+    {
+      "body_part": "손목",
+      "rula_component": "Wrist",
+      "service_indicator": "손목각도",
+      "zone_criteria": [
+        {"zone": 0, "range": "중립 (±0°)", "result": "Good", "korean": "중립 자세"},
+        {"zone": 1, "range": "±15° 이내", "result": "Good", "korean": "경미한 굴곡"},
+        {"zone": 2, "range": "±15° 초과 또는 비틀림", "result": "Bad", "korean": "과도한 굴곡/신전"}
+      ],
+      "adjustment": "손목이 비틀린 경우 +1 (중간 범위) 또는 +2 (끝 범위)",
+      "disease_risk": "손목건초염(CTS), 건초염, 손가락 저림",
+      "correction": "손목 받침대 설치, 키보드 앞 15cm 공간 확보 (VDT 고시 제5조 2항 7호)"
+    },
+    {
+      "body_part": "어깨/팔꿈치",
+      "rula_component": "Upper Arm",
+      "service_indicator": "팔꿈치각도",
+      "zone_criteria": [
+        {"zone": 0, "range": "-20° ~ 20°", "result": "Good", "korean": "자연스러운 하수"},
+        {"zone": 1, "range": "20~45° 또는 -20~0°", "result": "Good", "korean": "약간 올라가거나 뒤로"},
+        {"zone": 2, "range": "45~90°", "result": "Bad", "korean": "과도하게 올라간 상태"},
+        {"zone": 3, "range": "90° 초과", "result": "Bad", "korean": "심각하게 올라간 상태"}
+      ],
+      "adjustment": "어깨가 올라간 경우 +1, 팔이 지지된 경우 -1, 기댄 경우 -1",
+      "disease_risk": "어깨 충돌 증후군, 팔꿈치 관절염",
+      "correction": "의자 높이 조정으로 팔꿈치 90° 이상 유지 (VDT 고시 제6조 2항)"
+    },
+    {
+      "body_part": "무릎/하지",
+      "rula_component": "Legs",
+      "service_indicator": "무릎각도",
+      "zone_criteria": [
+        {"zone": 0, "range": "발과 다리가 지지된 상태", "result": "Good", "korean": "안정적 하체"},
+        {"zone": 1, "range": "미지지 상태", "result": "Bad", "korean": "하체 불안정"}
+      ],
+      "adjustment": "발과 다리가 지지된 경우 +1, 미지지 경우 +2",
+      "disease_risk": "하지 혈액순환 장애, 하체 부종",
+      "correction": "발 받침대 사용, 무릎 내각 90° 전후 유지 (VDT 고시 제6조 5항, 6항)"
+    }
+  ],
+
+  "score_calculation_flow": {
+    "group_a": {
+      "name": "팔·손목 분석",
+      "steps": [
+        "Step 1: 윗팔 위치 점수",
+        "Step 2: 아래팔 위치 점수",
+        "Step 3: 손목 굴곡 점수",
+        "Step 4: 손목 비틀림 점수",
+        "Step 5: Table A에서 그룹A 자세 점수 산출",
+        "Step 6: 근육 사용 가산점 (+1 또는 0)",
+        "Step 7: 하중/힘 가산점 (0~+3)",
+        "Step 8: 팔·손목 최종 점수 (Steps 5+6+7)"
+      ],
+      "service_indicators": ["팔꿈치각도", "손목각도", "작업대 높이"]
+    },
+    "group_b": {
+      "name": "목·몸통·다리 분석",
+      "steps": [
+        "Step 9: 목 위치 점수",
+        "Step 10: 몸통 위치 점수",
+        "Step 11: 다리 지지 상태 점수",
+        "Step 12: Table B에서 그룹B 자세 점수 산출",
+        "Step 13: 근육 사용 가산점 (+1 또는 0)",
+        "Step 14: 하중/힘 가산점 (0~+3)",
+        "Step 15: 목·몸통·다리 최종 점수 (Steps 12+13+14)"
+      ],
+      "service_indicators": ["CVA(목굴곡각)", "TIA(몸통굴곡각)", "무릎각도", "의자-등받이 거리"]
+    },
+    "final": "Table C: 그룹A 점수(행) × 그룹B 점수(열) → 최종 RULA 점수(1~7+)"
+  }
+}

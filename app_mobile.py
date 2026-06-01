@@ -1,5 +1,5 @@
 # =========================================================
-# app_mobile.py — Fit Me Up 모바일 통합 버전
+# app_mobile.py — 자세히봐 모바일 통합 버전
 #
 # 변경 사항 (app_mobile_team.py 기준):
 #   1. integrate.py 의존 제거
@@ -25,18 +25,109 @@ try:
 except Exception:
     st_autorefresh = None
 
-import json, hashlib, base64
+import json, hashlib, base64, html
+
+def login():
+
+    # ===== 로고 추가 =====
+    logo_path = Path(__file__).resolve().parent / "logo.png"
+
+    if logo_path.exists():
+        st.markdown(
+            """
+            <style>
+            .login-logo-wrap{
+                display:flex;
+                justify-content:center;
+                margin-top:-10px;
+                margin-bottom:18px;
+            }
+
+            .login-logo-wrap img{
+                width:170px;
+                height:auto;
+                object-fit:contain;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            f"""
+            <div class="login-logo-wrap">
+                <img src="data:image/png;base64,{get_logo_base64('logo.png')}">
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    # 기존 로그인 코드 계속...
+        st.markdown(
+            """
+        <style>
+
+        /* 로그인 화면 전체 상단 공백 제거 */
+        .main .block-container {
+            padding-top: 0rem !important;
+            margin-top: 0rem !important;
+        }
+
+        section.main > div {
+            padding-top: 0rem !important;
+        }
+
+        /* 로그인 input 위 공백 제거 */
+        [data-testid="stTextInput"] {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+
+        /* 로그인 카드 자체 여백 제거 */
+        .login-container {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+
+        </style>
+        """,
+            unsafe_allow_html=True,
+        )
+
+def _html_escape(value):
+    return html.escape(str(value), quote=True)
+
+from urllib.parse import quote
 import pandas as pd
 import altair as alt
 import requests
 
 from streamlit_webrtc import webrtc_streamer
 try:
-    from streamlit_webrtc import VideoProcessorBase
+    from streamlit_webrtc import VideoProcessorBase, WebRtcMode
     import av
 except Exception:
     VideoProcessorBase = object
+    WebRtcMode = None
     av = None
+
+from chatbot import process_rag_query
+
+# streamlit-webrtc 일부 버전에서 컴포넌트가 재시작/정지될 때
+# _polling_thread가 None인 상태로 stop()이 호출되어 앱 전체가 중단되는 문제 방지
+try:
+    from streamlit_webrtc.shutdown import SessionShutdownObserver
+
+    _original_shutdown_observer_stop = SessionShutdownObserver.stop
+
+    def _safe_shutdown_observer_stop(self):
+        if getattr(self, "_polling_thread", None) is None:
+            return
+        return _original_shutdown_observer_stop(self)
+
+    SessionShutdownObserver.stop = _safe_shutdown_observer_stop
+except Exception:
+    pass
 
 warnings.filterwarnings("ignore")
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
@@ -47,19 +138,28 @@ from jasee_core import (
     ENV_CLASSES, ENV_COLORS, FEEDBACK, INDICATOR_NAMES, IND_UNITS,
     DISPLAY_ORDER, COLOR_GOOD, COLOR_BAD, COLOR_NA,
     run_posture, run_environment,
-    predict_posture, AttentionMLP
+    predict_posture, AttentionMLP,
+    draw_posture_overlay, draw_env_overlay,
 )
 
 # =========================================================
 # 1. 기본 설정 (모바일: centered + sidebar collapsed)
 # =========================================================
 st.set_page_config(
-    page_title="Fit Me Up — AI 자세 분석",
+    page_title="자세히봐 — AI 자세 분석",
     layout="centered",
     initial_sidebar_state="collapsed",
 )
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# WebRTC가 로컬 네트워크/모바일 브라우저에서 Start 후 로딩 상태로 멈추는 문제를 줄이기 위한 STUN 설정
+RTC_CONFIGURATION = {
+    "iceServers": [
+        {"urls": ["stun:stun.l.google.com:19302"]},
+        {"urls": ["stun:stun1.l.google.com:19302"]},
+    ]
+}
 
 # ── 모델 로드 (캐시) ───────────────────────────────────────
 @st.cache_resource
@@ -117,23 +217,46 @@ def analyze_image(pil_image: Image.Image) -> dict:
     except Exception as e:
         return {"ok": False, "message": f"이미지 변환 실패: {e}"}
 
-    posture_out = run_posture(
+    # 1차 자세 분석: 환경 YOLO 필터링에 필요한 사람 키포인트를 먼저 얻습니다.
+    # 이 단계에서는 이전 env_bboxes가 없을 수 있으므로 환경 지표가 None일 수 있습니다.
+    posture_out_first = run_posture(
         frame, _pose_yolo, _mlp, _device,
         st.session_state.get("env_bboxes", {})
     )
-    metrics   = posture_out.get("metrics", {})
-    gate_pass = posture_out.get("gate_pass", False)
-    kp        = posture_out.get("keypoints", {})
+    first_metrics = posture_out_first.get("metrics", {})
 
-    if not metrics:
+    if not first_metrics:
         return {"ok": False, "message": "관절 탐지 실패 — 측면 전신 이미지를 사용해주세요."}
 
-    # 포즈 키포인트 추출 (환경 필터링용)
-    _kp_raw = posture_out.get("keypoints_raw")  # jasee_core에서 raw numpy 배열
-    env_out  = run_environment(frame, _env_yolo, pose_keypoints=_kp_raw)
-    detected = env_out.get("detected", {})
-    bboxes   = env_out.get("bboxes", {})
-    st.session_state.env_bboxes = bboxes
+    # 환경 YOLO 실행: monitor / desk_surface / chair_back / chair_seat bbox를 최신 프레임에서 얻습니다.
+    _kp_raw_first = posture_out_first.get("keypoints_raw")
+    env_out  = run_environment(frame, _env_yolo, pose_keypoints=_kp_raw_first)
+    detected = env_out.get("detected", {}) or {}
+    bboxes   = env_out.get("bboxes", {}) or {}
+
+    # 환경 bbox가 감지된 경우에만 세션에 저장합니다.
+    # 빈 dict로 덮어쓰면 다음 분석에서 정상 bbox까지 사라질 수 있어 방지합니다.
+    if bboxes:
+        st.session_state.env_bboxes = bboxes
+    else:
+        bboxes = st.session_state.get("env_bboxes", {}) or {}
+
+    # 2차 자세/환경 지표 계산: 최신 환경 bbox를 넣어 gaze_angle / desk_diff / chair_gap을 다시 계산합니다.
+    try:
+        posture_out = run_posture(frame, _pose_yolo, _mlp, _device, bboxes)
+        metrics = posture_out.get("metrics", {}) or {}
+        if not metrics:
+            posture_out = posture_out_first
+            metrics = first_metrics
+    except Exception:
+        posture_out = posture_out_first
+        metrics = first_metrics
+
+    gate_pass = posture_out.get("gate_pass", False)
+    kp        = posture_out.get("keypoints", {})
+    _kp_raw = posture_out.get("keypoints_raw")
+    if _kp_raw is None:
+        _kp_raw = _kp_raw_first
 
     # jasee_core 영어키 → 팀버전 한글키 매핑
     KR_MAP = {
@@ -343,6 +466,9 @@ def analyze_image(pil_image: Image.Image) -> dict:
         "good_count":     good_cnt,
         "total_count":    total,
         "metrics":        metrics,
+        "env_detected":   detected,
+        "env_bboxes":     bboxes,
+        "keypoints_raw":  _kp_raw,
     }
 
 
@@ -484,6 +610,86 @@ def render_ai_correction_comment(result):
     """
     return
 
+def _render_chat_bubble(role, message):
+    """
+    Streamlit 기본 st.chat_message/st.write가 앱 전역 CSS의 영향을 받아
+    챗봇 답변에 밑줄처럼 보이는 border/decoration이 생기는 문제를 막기 위한
+    전용 채팅 말풍선 렌더러입니다.
+    """
+    role_label = "나" if role == "user" else "AI 챗봇"
+    role_class = "user" if role == "user" else "assistant"
+
+    safe_message = html.escape(str(message or ""))
+    safe_message = safe_message.replace("\n", "<br>")
+
+    st.markdown(
+        f"""
+<div class="jasee-chat-row {role_class}">
+    <div class="jasee-chat-bubble {role_class}">
+        <div class="jasee-chat-role">{role_label}</div>
+        <div class="jasee-chat-text">{safe_message}</div>
+    </div>
+</div>
+""",
+        unsafe_allow_html=True,
+    )
+
+
+def render_mobile_chatbot():
+    st.markdown("## 자세히봐 AI 챗봇")
+
+    if "rag_history" not in st.session_state:
+        st.session_state.rag_history = []
+
+    # ===== 채팅 출력 =====
+    for chat in st.session_state.rag_history:
+        _render_chat_bubble("user", chat.get("user", ""))
+        _render_chat_bubble("assistant", chat.get("assistant", ""))
+
+    # ===== 하단 상담 유형 + 입력창 =====
+    # st.chat_input을 컨테이너 안에 넣어 페이지 하단 고정이 아니라
+    # 가장 최신 답변 바로 아래에 표시되도록 합니다.
+    with st.container():
+        st.markdown('<div class="chat-select-wrap">', unsafe_allow_html=True)
+
+        selected_func_id = st.selectbox(
+            "상담 유형",
+            options=[1, 2, 3, 4, 5],
+            format_func=lambda x: {
+                1: "자세 분석 결과 설명",
+                2: "RULA 점수 해석",
+                3: "작업환경 적합성",
+                4: "부위별 통증 완화",
+                5: "운동 추천",
+            }[x],
+            key="chatbot_selectbox"
+        )
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        # ===== 입력창 =====
+        user_query = st.chat_input("궁금한 내용을 입력하세요")
+
+    if user_query:
+        _render_chat_bubble("user", user_query)
+
+        with st.spinner("답변 생성 중..."):
+            answer = process_rag_query(
+                query=user_query,
+                selected_func_id=selected_func_id,
+                history=st.session_state.rag_history
+            )
+
+        _render_chat_bubble("assistant", answer)
+
+        st.session_state.rag_history.append({
+            "user": user_query,
+            "assistant": answer
+        })
+
+        st.rerun()
+
+
 # =========================================================
 # 2. CSS — 첨부 HTML 느낌의 세련된 UI
 # =========================================================
@@ -523,6 +729,211 @@ html, body, [class*="css"] {
     background: var(--bg);
 }
 
+/* AI 챗봇 전용 말풍선: 앱 전역 CSS로 인한 밑줄/테두리 오염 방지 */
+.jasee-chat-row,
+.jasee-chat-row *,
+.jasee-chat-bubble,
+.jasee-chat-text,
+.jasee-chat-role {
+    text-decoration: none !important;
+    border-bottom: none !important;
+    box-shadow: none;
+}
+
+.jasee-chat-row {
+    width: 100%;
+    display: flex;
+    margin: 10px 0;
+}
+
+.jasee-chat-row.user {
+    justify-content: flex-end;
+}
+
+.jasee-chat-row.assistant {
+    justify-content: flex-start;
+}
+
+.jasee-chat-bubble {
+    max-width: 88%;
+    padding: 13px 15px;
+    border-radius: 18px;
+    line-height: 1.75;
+    box-shadow: 0 6px 18px rgba(15, 30, 54, 0.06);
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+}
+
+.jasee-chat-bubble.user {
+    background: linear-gradient(135deg, #2563EB, #1D4ED8);
+    color: #FFFFFF;
+    border-top-right-radius: 6px;
+}
+
+.jasee-chat-bubble.assistant {
+    background: #FFFFFF;
+    color: #172033;
+    border: 1px solid #E2ECF6 !important;
+    border-top-left-radius: 6px;
+}
+
+.jasee-chat-role {
+    font-size: 11px;
+    font-weight: 900;
+    margin-bottom: 5px;
+    opacity: 0.72;
+}
+
+.jasee-chat-text {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.75;
+    white-space: normal;
+}
+
+
+/* AI 챗봇 하단 입력 영역 */
+.jasee-chat-bottom-controls {
+    margin: 18px auto 0 auto !important;
+    padding: 16px 16px 0 16px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    background: #FFFFFF !important;
+    border: 1px solid #DCE8F5 !important;
+    border-bottom: 0 !important;
+    border-radius: 24px 24px 0 0 !important;
+    box-shadow: 0 12px 28px rgba(37, 99, 235, 0.06) !important;
+}
+
+.jasee-chat-control-title {
+    font-size: 13px !important;
+    font-weight: 900 !important;
+    color: #172033 !important;
+    margin-bottom: 8px !important;
+}
+
+/* marker가 있는 챗봇 화면 안의 selectbox/form만 부드러운 모바일 UI로 보정 */
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-bottom-controls) [data-testid="stSelectbox"] {
+    margin-top: -1px !important;
+    margin-bottom: 0 !important;
+    padding: 0 16px 12px 16px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    background: #FFFFFF !important;
+    border-left: 1px solid #DCE8F5 !important;
+    border-right: 1px solid #DCE8F5 !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-bottom-controls) [data-testid="stSelectbox"] > label {
+    display: none !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-bottom-controls) [data-testid="stSelectbox"] div[data-baseweb="select"] {
+    width: 100% !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-bottom-controls) [data-testid="stSelectbox"] div[data-baseweb="select"] > div {
+    width: 100% !important;
+    min-height: 50px !important;
+    border: 1px solid #D7E4F2 !important;
+    border-radius: 18px !important;
+    background: #FFFFFF !important;
+    box-shadow: 0 6px 16px rgba(15, 30, 54, 0.03) !important;
+    box-sizing: border-box !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-bottom-controls) [data-testid="stSelectbox"] div[data-baseweb="select"] span,
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-bottom-controls) [data-testid="stSelectbox"] div[data-baseweb="select"] div {
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    color: #172033 !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-bottom-controls) [data-testid="stForm"] {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding: 8px 16px 16px 16px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    background: #FFFFFF !important;
+    border: 1px solid #DCE8F5 !important;
+    border-top: 0 !important;
+    border-radius: 0 0 24px 24px !important;
+    box-shadow: 0 18px 34px rgba(37, 99, 235, 0.06) !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-bottom-controls) [data-testid="stForm"] form {
+    width: 100% !important;
+}
+
+/* 입력창 + 버튼 줄: selectbox와 같은 내부 너비로 맞춤 */
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-bottom-controls) [data-testid="stForm"] div[data-testid="stHorizontalBlock"] {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-bottom-controls) [data-testid="stForm"] div[data-testid="column"] {
+    min-width: 0 !important;
+    width: auto !important;
+    flex: 1 1 auto !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-bottom-controls) [data-testid="stForm"] div[data-testid="column"]:last-child {
+    flex: 0 0 52px !important;
+    min-width: 52px !important;
+    width: 52px !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-bottom-controls) [data-testid="stForm"] [data-testid="stTextInput"] {
+    margin: 0 !important;
+    width: 100% !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-bottom-controls) [data-testid="stForm"] [data-testid="stTextInput"] input {
+    width: 100% !important;
+    height: 52px !important;
+    border-radius: 18px !important;
+    border: 1px solid transparent !important;
+    background: #F5F7FB !important;
+    color: #172033 !important;
+    font-size: 15px !important;
+    padding: 0 16px !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-bottom-controls) [data-testid="stForm"] [data-testid="stTextInput"] input:focus {
+    background: #FFFFFF !important;
+    border-color: #2563EB !important;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10) !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-bottom-controls) [data-testid="stFormSubmitButton"] {
+    width: 52px !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-bottom-controls) [data-testid="stFormSubmitButton"] button {
+    width: 52px !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    padding: 0 !important;
+    border-radius: 17px !important;
+    background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
+    color: #FFFFFF !important;
+    font-size: 22px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.28) !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-bottom-controls) [data-testid="stFormSubmitButton"] button:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.36) !important;
+}
 
 /* 컴포넌트 내부 스크롤 제거: iframe은 충분한 높이로 펼치고 페이지 전체 스크롤만 사용 */
 iframe {
@@ -542,7 +953,7 @@ iframe {
 
 /* Streamlit 기본 여백 조정 */
 .block-container {
-    padding-top: 4.5rem !important;
+    padding-top: 0rem !important;
     padding-bottom: 3rem;
     max-width: 1280px;
 }
@@ -970,6 +1381,31 @@ div[data-testid="stRadio"][class*="horizontal"] label[data-checked="true"] p {
     }
 }
 
+
+
+/* 챗봇 입력 영역 최종 정렬 보정: 전역 모바일 column CSS보다 우선 적용 */
+@media (max-width: 700px) {
+    div[data-testid="stVerticalBlock"]:has(.jasee-chat-bottom-controls) [data-testid="stForm"] div[data-testid="stHorizontalBlock"] {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        gap: 10px !important;
+        width: 100% !important;
+    }
+
+    div[data-testid="stVerticalBlock"]:has(.jasee-chat-bottom-controls) [data-testid="stForm"] div[data-testid="column"] {
+        min-width: 0 !important;
+        width: auto !important;
+        flex: 1 1 auto !important;
+    }
+
+    div[data-testid="stVerticalBlock"]:has(.jasee-chat-bottom-controls) [data-testid="stForm"] div[data-testid="column"]:last-child {
+        flex: 0 0 52px !important;
+        min-width: 52px !important;
+        width: 52px !important;
+    }
+}
 </style>
 """,
     unsafe_allow_html=True,
@@ -1683,9 +2119,32 @@ def render_pretty_7_metric_dashboard(result):
         if default_item not in recommend:
             recommend.append(default_item)
 
+    # Streamlit의 st.markdown HTML <img>에서는 로컬 상대경로가 깨질 수 있으므로
+    # PNG 파일을 base64(data URI)로 변환해서 넣습니다.
+    stretch_image_map = {
+        "하체 스트레칭": image_to_base64_src(Path(BASE_DIR) / "assets" / "stretch" / "lower_body.png"),
+        "손목 스트레칭": image_to_base64_src(Path(BASE_DIR) / "assets" / "stretch" / "wrist.png"),
+        "목 스트레칭": image_to_base64_src(Path(BASE_DIR) / "assets" / "stretch" / "neck.png"),
+        "허리 스트레칭": image_to_base64_src(Path(BASE_DIR) / "assets" / "stretch" / "waist.png"),
+        "어깨 이완": image_to_base64_src(Path(BASE_DIR) / "assets" / "stretch" / "shoulder.png"),
+    }
+
+    def stretch_img_html(label):
+        img_src = stretch_image_map.get(label) or stretch_image_map.get("목 스트레칭", "")
+        if img_src:
+            return f'<img class="stretch-img" src="{img_src}" alt="{label}">'
+        return '<div class="stretch-img-missing">이미지 없음</div>'
+
     stretch_items_html = "".join([
-        f'<div class="stretch-chip"><div class="stretch-emoji">{emoji}</div><div>{label}</div></div>'
-        for emoji, label in zip(["🙆", "🧘", "🤲"], recommend[:3])
+        (
+            f'<div class="jasee-stretch-chip-wrapper">'
+            f'<div class="jasee-stretch-chip">'
+            f'{stretch_img_html(label)}'
+            f'<div>{_html_escape(label)}</div>'
+            f'</div>'
+            f'</div>'
+        )
+        for label in recommend[:3]
     ])
 
     goal_items = []
@@ -2304,13 +2763,31 @@ def render_pretty_7_metric_dashboard(result):
         flex-direction:column;
         align-items:center;
         justify-content:center;
-        gap:6px;
+        gap:0;
         font-size:12px;
         font-weight:850;
         color:#334155;
         text-align:center;
     }
-    .stretch-emoji { font-size:28px; }
+    .stretch-img {
+        width:72px;
+        height:72px;
+        object-fit:contain;
+        margin-bottom:4px;
+        display:block;
+    }
+    .stretch-img-missing {
+        width:72px;
+        height:72px;
+        border:1px dashed #CBD5E1;
+        border-radius:10px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:9px;
+        color:#94A3B8;
+        margin-bottom:4px;
+    }
     .more-link {
         text-align:center;
         margin-top:10px;
@@ -2337,6 +2814,26 @@ def render_pretty_7_metric_dashboard(result):
         .pretty-legend { flex-wrap:wrap !important; justify-content:flex-start !important; gap:10px !important; }
         .summary-wrap { grid-template-columns:1fr !important; }
         .stretch-row { flex-direction:column !important; }
+
+        /* 결과 iframe 안쪽 하단 여백 축소 */
+        .pretty-dashboard {
+            padding-bottom: 10px !important;
+        }
+        .feedback-title-wrap {
+            margin: 18px 0 10px 0 !important;
+            padding-top: 14px !important;
+        }
+        .feedback-grid {
+            gap: 10px !important;
+        }
+        .ai-feedback-box {
+            min-height: auto !important;
+            padding: 14px 16px !important;
+        }
+        .ai-feedback-box li {
+            margin-bottom: 4px !important;
+            line-height: 1.5 !important;
+        }
     }
     </style>
     </head>
@@ -2424,11 +2921,7 @@ def render_pretty_7_metric_dashboard(result):
             <div class="ai-feedback-subtitle goal">오늘의 실천 목표</div>
             <ul>{goals_html}</ul>
         </div>
-        <div class="ai-feedback-box blue">
-            <div class="ai-feedback-subtitle blue">추천 운동 및 스트레칭</div>
-            <div class="stretch-row">{stretch_items_html}</div>
-            <div class="more-link">운동 더 보기 ›</div>
-        </div>
+        
     </div>
 
     </div>
@@ -2436,7 +2929,217 @@ def render_pretty_7_metric_dashboard(result):
     </html>
     """
 
-    components.html(html, height=6200, scrolling=False)
+    # 실시간/이미지 자세측정 결과 공통:
+    # 5200px처럼 과도하게 큰 iframe 높이는 「오늘의 실천 목표」 아래에
+    # 큰 빈 여백을 만들기 때문에, 모바일 세로 카드가 잘리지 않는 선에서 높이를 줄입니다.
+    components.html(html, height=4300, scrolling=False)
+
+    # =========================================================
+    # 추천 운동 및 스트레칭 클릭 팝업
+    # - components.html() 내부 iframe에서는 Streamlit 이벤트가 안정적으로 동작하지 않으므로
+    #   운동 박스만 Streamlit 본문 HTML로 다시 렌더링합니다.
+    # - 기존 카드 UI는 유지하고, 카드 전체 위에 투명 링크 버튼을 겹쳐 클릭 가능하게 만듭니다.
+    # =========================================================
+    all_exercise_labels = [
+        "하체 스트레칭",
+        "손목 스트레칭",
+        "목 스트레칭",
+        "허리 스트레칭",
+        "어깨 이완",
+    ]
+
+    if "exercise_popup_label" not in st.session_state:
+        st.session_state.exercise_popup_label = None
+
+    # Streamlit 버튼을 투명 레이어처럼 카드 위에 겹쳐 사용합니다.
+    # href/query_params를 사용하지 않기 때문에 클릭해도 로그인 화면으로 튕기지 않습니다.
+    st.markdown(
+        """
+<style>
+.jasee-exercise-box {
+    min-height:0 !important;
+    border-radius:16px;
+    border:1px solid #E2ECF6;
+    padding:14px 16px 12px 16px;
+    background:linear-gradient(135deg,#FFFFFF,#EFF6FF);
+    box-sizing:border-box;
+    margin-top:0 !important;
+    margin-bottom:12px !important;
+}
+.jasee-exercise-subtitle {
+    font-size:14px;
+    font-weight:950;
+    margin-bottom:10px;
+    color:#2563EB;
+}
+.jasee-stretch-chip {
+    min-height:172px;
+    border:1px solid #E2ECF6;
+    border-radius:12px;
+    background:#FFFFFF;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    font-size:12px;
+    font-weight:850;
+    color:#334155;
+    text-align:center;
+    box-sizing:border-box;
+    transition:all .18s ease;
+    margin-bottom:0 !important;
+}
+.jasee-stretch-chip .stretch-img {
+    width:140px;
+    height:140px;
+    object-fit:contain;
+    margin-bottom:4px;
+    display:block;
+}
+.jasee-stretch-chip .stretch-img-missing {
+    width:140px;
+    height:140px;
+    border:1px dashed #CBD5E1;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:9px;
+    color:#94A3B8;
+    margin-bottom:4px;
+}
+/* 운동 카드 투명 클릭 레이어: st.markdown의 div는 Streamlit 요소를 실제로 감싸지 못하므로
+   같은 vertical block 안의 marker를 기준으로 버튼을 카드 위에 겹칩니다. */
+div[data-testid="column"] > div[data-testid="stVerticalBlock"]:has(.jasee-stretch-click-target) div[data-testid="stButton"] {
+    margin-top:-172px !important;
+    height:172px !important;
+    position:relative !important;
+    z-index:30 !important;
+}
+div[data-testid="column"] > div[data-testid="stVerticalBlock"]:has(.jasee-stretch-click-target) div[data-testid="stButton"] button {
+    height:172px !important;
+    min-height:172px !important;
+    width:100% !important;
+    opacity:0 !important;
+    background:transparent !important;
+    border:0 !important;
+    box-shadow:none !important;
+    padding:0 !important;
+    cursor:pointer !important;
+}
+div[data-testid="column"] > div[data-testid="stVerticalBlock"]:has(.jasee-stretch-click-target) div[data-testid="stButton"] button:hover,
+div[data-testid="column"] > div[data-testid="stVerticalBlock"]:has(.jasee-stretch-click-target) div[data-testid="stButton"] button:focus,
+div[data-testid="column"] > div[data-testid="stVerticalBlock"]:has(.jasee-stretch-click-target) div[data-testid="stButton"] button:active {
+    opacity:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    border:0 !important;
+    transform:none !important;
+}
+div[data-testid="column"] > div[data-testid="stVerticalBlock"]:has(.jasee-stretch-click-target):hover .jasee-stretch-chip {
+    transform:translateY(-2px);
+    box-shadow:0 8px 18px rgba(37, 99, 235, 0.12);
+    border-color:rgba(37, 99, 235, 0.35);
+}
+.jasee-stretch-chip:hover {
+    transform:translateY(-2px);
+    box-shadow:0 8px 18px rgba(37, 99, 235, 0.12);
+    border-color:rgba(37, 99, 235, 0.35);
+}
+.jasee-more-button-wrap div[data-testid="stButton"] button {
+    opacity:1 !important;
+    height:38px !important;
+    min-height:38px !important;
+    background:transparent !important;
+    color:#2563EB !important;
+    box-shadow:none !important;
+    border:0 !important;
+    font-size:13px !important;
+    font-weight:950 !important;
+    padding:0 !important;
+}
+.jasee-more-button-wrap div[data-testid="stButton"] button:hover {
+    text-decoration:underline !important;
+    transform:none !important;
+    box-shadow:none !important;
+}
+
+/* 자세 결과 iframe 아래 여백 최소화 */
+div[data-testid="stIFrame"] {
+    margin-bottom:0 !important;
+}
+</style>
+""",
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        '<div class="jasee-exercise-box"><div class="jasee-exercise-subtitle">추천 운동 및 스트레칭</div>',
+        unsafe_allow_html=True,
+    )
+
+    cols = st.columns(len(recommend[:3]))
+    for col, label in zip(cols, recommend[:3]):
+        with col:
+            st.markdown(
+                f'<div class="jasee-stretch-click-target"></div><div class="jasee-stretch-chip">{stretch_img_html(label)}</div>',
+                unsafe_allow_html=True,
+            )
+            if st.button(label, key=f"exercise_overlay_btn_{label}", use_container_width=True):
+                st.session_state.exercise_popup_label = label
+                st.rerun()
+
+    st.markdown('<div style="height:6px;"></div>', unsafe_allow_html=True)
+    if st.button("운동 더 보기 ›", key="exercise_more_overlay_btn", use_container_width=True):
+        st.session_state.exercise_popup_label = "all"
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    @st.dialog("맞춤 운동 추천")
+    def show_exercise_rag_popup(label):
+        if label == "all":
+            query = """
+            사용자의 자세측정 결과를 바탕으로
+            하체 스트레칭, 손목 스트레칭, 목 스트레칭, 허리 스트레칭, 어깨 이완
+            5가지 전체 운동을 추천해줘.
+
+            각 항목별로 아래 형식으로 정리해줘.
+            - 운동명
+            - 운동 방법
+            - 횟수 및 시간
+            - 효과
+            - 주의사항
+            """
+        else:
+            query = f"""
+            사용자의 자세측정 결과를 바탕으로 '{label}'에 맞는 운동과 스트레칭을 추천해줘.
+
+            아래 형식으로 정리해줘.
+            - 운동명
+            - 운동 방법
+            - 횟수 및 시간
+            - 효과
+            - 주의사항
+            """
+
+        with st.spinner("RAG 기반 운동 추천 생성 중..."):
+            answer = process_rag_query(
+                query=query,
+                selected_func_id=5,
+                history=[]
+            )
+
+        st.markdown(answer)
+
+        if st.button("닫기", key=f"close_exercise_popup_{label}", use_container_width=True):
+            st.session_state.exercise_popup_label = None
+            st.rerun()
+
+    clicked_exercise = st.session_state.get("exercise_popup_label")
+    if clicked_exercise:
+        if clicked_exercise == "all" or clicked_exercise in all_exercise_labels:
+            show_exercise_rag_popup(clicked_exercise)
 
 
 def init_history():
@@ -3180,10 +3883,6 @@ def make_logo_transparent(filename="logo.png"):
 def render_auth_page():
     """
     로그인/회원가입 화면
-    - 로그인 후 모바일 화면과 같은 430px 프레임 유지
-    - 로고가 과하게 커지거나 위아래 여백이 생기는 문제 해결
-    - auth 라벨 숨김
-    - 로그인/회원가입 탭, 입력창, 버튼을 모바일 폭에 맞게 정렬
     """
 
     st.markdown(
@@ -3227,6 +3926,8 @@ section[data-testid="stSidebar"] {
     display: none !important;
 }
 
+/* auth-card CSS는 더 이상 HTML 태그로 묶이지 않으므로 
+   원하신다면 .block-container 전체 배경으로 적용하거나 지우셔도 무방합니다. */
 .auth-card {
     width: 100%;
     box-sizing: border-box;
@@ -3375,16 +4076,17 @@ div[data-testid="stButton"] button {
 
     logo_path = make_logo_transparent("logo.png")
 
-    st.markdown('<div class="auth-card">', unsafe_allow_html=True)
+    # ❌ [수정됨] 흰색 박스를 만들던 시작 div 태그를 삭제했습니다.
+    # st.markdown('<div class="auth-card">', unsafe_allow_html=True)
 
     if logo_path is not None:
         logo_b64 = base64.b64encode(Path(logo_path).read_bytes()).decode("utf-8")
         st.markdown(
-            f'<div class="auth-logo-wrap"><img src="data:image/png;base64,{logo_b64}" alt="Fit Me Up logo"></div>',
+            f'<div class="auth-logo-wrap"><img src="data:image/png;base64,{logo_b64}" alt="자세히봐 logo"></div>',
             unsafe_allow_html=True,
         )
     else:
-        st.markdown('<div class="auth-brand-fallback">Fit Me Up</div>', unsafe_allow_html=True)
+        st.markdown('<div class="auth-brand-fallback">자세히봐</div>', unsafe_allow_html=True)
 
     st.markdown(
         '<div class="auth-guide-text">로그인 후 AI 자세 분석 서비스를 이용하세요.</div>',
@@ -3409,11 +4111,11 @@ div[data-testid="stButton"] button {
         if st.button("로그인", use_container_width=True):
             if username not in users:
                 st.error("존재하지 않는 아이디입니다.")
-                st.markdown('</div>', unsafe_allow_html=True)
+                # ❌ [수정됨] 불필요한 닫기 태그 삭제
                 return
             if users[username]["password"] != hash_password(password):
                 st.error("비밀번호가 일치하지 않습니다.")
-                st.markdown('</div>', unsafe_allow_html=True)
+                # ❌ [수정됨] 불필요한 닫기 태그 삭제
                 return
             st.session_state.logged_in = True
             st.session_state.username = username
@@ -3428,15 +4130,15 @@ div[data-testid="stButton"] button {
         if st.button("회원가입", use_container_width=True):
             if not new_username or not new_password:
                 st.error("아이디와 비밀번호를 입력해주세요.")
-                st.markdown('</div>', unsafe_allow_html=True)
+                # ❌ [수정됨] 불필요한 닫기 태그 삭제
                 return
             if new_username in users:
                 st.error("이미 존재하는 아이디입니다.")
-                st.markdown('</div>', unsafe_allow_html=True)
+                # ❌ [수정됨] 불필요한 닫기 태그 삭제
                 return
             if new_password != new_password_check:
                 st.error("비밀번호가 일치하지 않습니다.")
-                st.markdown('</div>', unsafe_allow_html=True)
+                # ❌ [수정됨] 불필요한 닫기 태그 삭제
                 return
 
             users[new_username] = {
@@ -3446,7 +4148,8 @@ div[data-testid="stButton"] button {
             save_users(users)
             st.success("회원가입이 완료되었습니다. 로그인해주세요.")
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    # ❌ [수정됨] 마지막에 있던 닫기 div 태그도 삭제했습니다.
+    # st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================
 # 6. 모바일 앱용 상단 메뉴
@@ -3467,6 +4170,7 @@ if "username" not in st.session_state or st.session_state.username is None:
 
 MENU_OPTIONS = [
     "📸 자세측정",
+    "💬 AI 챗봇",
     "🧘 운동 및 스트레칭 추천",
     "📈 측정이력",
     "🧾 예상 영수증",
@@ -3478,7 +4182,7 @@ MENU_OPTIONS = [
 st.markdown(
     f"""
 <div class="mobile-app-header">
-    <div class="mobile-app-logo">Fit Me Up</div>
+    <div class="mobile-app-logo">자세히봐</div>
     <div class="mobile-app-sub">AI 자세 분석 서비스</div>
     <div class="mobile-app-user">로그인 계정 · {st.session_state.username}</div>
 </div>
@@ -3900,6 +4604,138 @@ p, span, div, li {
     font-size: 12px !important;
     line-height: 1.6 !important;
 }
+
+
+/* AI 챗봇 입력 패널 최종 보정: 선택박스와 입력창 폭을 맞추고 버튼을 같은 줄에 고정 */
+.jasee-chat-input-panel-anchor {
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-input-panel-anchor) [data-testid="stSelectbox"] {
+    margin-top: 16px !important;
+    margin-bottom: 0 !important;
+    padding: 14px 16px 12px 16px !important;
+    background: #FFFFFF !important;
+    border: 1px solid #DCE8F5 !important;
+    border-bottom: 0 !important;
+    border-radius: 24px 24px 0 0 !important;
+    box-shadow: 0 16px 34px rgba(37, 99, 235, 0.07) !important;
+    box-sizing: border-box !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-input-panel-anchor) [data-testid="stSelectbox"] > label {
+    display: block !important;
+    margin: 0 0 8px 0 !important;
+    padding: 0 !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-input-panel-anchor) [data-testid="stSelectbox"] > label p {
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    font-weight: 900 !important;
+    color: #334155 !important;
+    margin: 0 !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-input-panel-anchor) [data-testid="stSelectbox"] div[data-baseweb="select"] > div {
+    min-height: 50px !important;
+    border: 1px solid #D7E4F2 !important;
+    border-radius: 17px !important;
+    background: #FFFFFF !important;
+    box-shadow: none !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-input-panel-anchor) [data-testid="stSelectbox"] div[data-baseweb="select"] span,
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-input-panel-anchor) [data-testid="stSelectbox"] div[data-baseweb="select"] div {
+    font-size: 15px !important;
+    font-weight: 900 !important;
+    color: #172033 !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-input-panel-anchor) [data-testid="stForm"] {
+    margin-top: -0.35rem !important;
+    padding: 0 16px 16px 16px !important;
+    background: #FFFFFF !important;
+    border: 1px solid #DCE8F5 !important;
+    border-top: 0 !important;
+    border-radius: 0 0 24px 24px !important;
+    box-shadow: 0 20px 36px rgba(37, 99, 235, 0.07) !important;
+    box-sizing: border-box !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-input-panel-anchor) [data-testid="stForm"] form {
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-input-panel-anchor) [data-testid="stForm"] [data-testid="stHorizontalBlock"] {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-input-panel-anchor) [data-testid="stForm"] div[data-testid="column"] {
+    min-width: 0 !important;
+    width: auto !important;
+    flex: 1 1 auto !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-input-panel-anchor) [data-testid="stForm"] div[data-testid="column"]:last-child {
+    flex: 0 0 50px !important;
+    width: 50px !important;
+    min-width: 50px !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-input-panel-anchor) [data-testid="stForm"] [data-testid="stTextInput"],
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-input-panel-anchor) [data-testid="stForm"] [data-testid="stFormSubmitButton"] {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-input-panel-anchor) [data-testid="stForm"] [data-testid="stTextInput"] input {
+    height: 50px !important;
+    min-height: 50px !important;
+    border-radius: 16px !important;
+    border: 1px solid transparent !important;
+    background: #F4F7FB !important;
+    color: #172033 !important;
+    font-size: 15px !important;
+    padding: 0 16px !important;
+    box-shadow: none !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-input-panel-anchor) [data-testid="stForm"] [data-testid="stTextInput"] input:focus {
+    background: #FFFFFF !important;
+    border-color: #2563EB !important;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10) !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-input-panel-anchor) [data-testid="stFormSubmitButton"] button {
+    width: 50px !important;
+    height: 50px !important;
+    min-height: 50px !important;
+    padding: 0 !important;
+    border-radius: 16px !important;
+    background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
+    color: #FFFFFF !important;
+    font-size: 20px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.28) !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chat-input-panel-anchor) [data-testid="stFormSubmitButton"] button p {
+    font-size: 20px !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+}
 </style>
 """,
     unsafe_allow_html=True,
@@ -4183,24 +5019,27 @@ def _render_realtime_feedback_card(snapshot):
         badge_class, color = "badge-amber", "#BA7517"
 
     if phase == "posture":
+        # 기존의 "실시간 자세 판정 / 남은 측정 시간 / GOOD 유지 시간" 카드 제거
+        # → 동일한 위치에 "측정 진행 상황" 카드만 표시
+        posture_ratio = min(max(elapsed / 20, 0), 1)
+        progress_pct = int(posture_ratio * 100)
         st.markdown(f"""
-<div class="fit-card" style="border-left:6px solid {color};">
-    <div class="fit-card-title">
-        <span>실시간 자세 판정</span>
-        <span class="fit-badge {badge_class}">{status}</span>
+<div class="fit-card">
+    <div style="font-size:14px;font-weight:900;color:#172033;margin-bottom:12px;">
+        측정 진행 상황
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
-        <div style="padding:14px;border-radius:14px;background:#F8FAFC;text-align:center;">
-            <div style="font-size:12px;color:#667085;">남은 측정 시간</div>
-            <div style="font-size:34px;font-weight:950;color:#172033;">{remain}초</div>
-        </div>
-        <div style="padding:14px;border-radius:14px;background:#F8FAFC;text-align:center;">
-            <div style="font-size:12px;color:#667085;">GOOD 유지 시간</div>
-            <div style="font-size:34px;font-weight:950;color:{color};">{good_hold:.1f}초</div>
-        </div>
+    <div style="width:100%;height:14px;background:#D9DEE7;border-radius:999px;overflow:hidden;margin-bottom:12px;">
+        <div style="width:{progress_pct}%;height:100%;background:#33B76A;border-radius:999px;"></div>
     </div>
-    <div style="font-size:13px;line-height:1.8;color:#667085;">
-        {snapshot.get("last_feedback", "측정 대기 중입니다.")}
+    <div style="display:grid;grid-template-columns:1fr 1fr;text-align:center;gap:8px;">
+        <div>
+            <div style="font-size:12.5px;font-weight:800;color:#33B76A;">자세 측정</div>
+            <div style="font-size:12px;color:#334155;margin-top:4px;">(20초)</div>
+        </div>
+        <div>
+            <div style="font-size:12.5px;font-weight:800;color:#667085;">작업환경 측정</div>
+            <div style="font-size:12px;color:#334155;margin-top:4px;">(자동 전환)</div>
+        </div>
     </div>
 </div>""", unsafe_allow_html=True)
 
@@ -4214,17 +5053,293 @@ def _render_realtime_feedback_card(snapshot):
             icon  = "✅" if ok else "⬜"
             items_html += f'<div style="font-size:13px;color:{c};margin:4px 0;">{icon} {label}</div>'
 
+        found = sum(1 for item in items_kr if item in env_det)
+        env_pct = min(50 + int((found / 4) * 50), 100)
         st.markdown(f"""
-<div class="fit-card" style="border-left:6px solid #1D9E75;">
-    <div class="fit-card-title">
-        <span>작업환경 인식 중</span>
-        <span class="fit-badge badge-green">Environment</span>
+<div class="fit-card">
+    <div style="font-size:14px;font-weight:900;color:#172033;margin-bottom:12px;">
+        측정 진행 상황
     </div>
-    <div style="font-size:13px;color:#667085;margin-bottom:10px;">
+    <div style="width:100%;height:14px;background:#D9DEE7;border-radius:999px;overflow:hidden;margin-bottom:12px;">
+        <div style="width:{env_pct}%;height:100%;background:#33B76A;border-radius:999px;"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;text-align:center;gap:8px;margin-bottom:12px;">
+        <div>
+            <div style="font-size:12.5px;font-weight:800;color:#33B76A;">자세 측정</div>
+            <div style="font-size:12px;color:#334155;margin-top:4px;">완료</div>
+        </div>
+        <div>
+            <div style="font-size:12.5px;font-weight:800;color:#33B76A;">작업환경 측정</div>
+            <div style="font-size:12px;color:#334155;margin-top:4px;">{found}/4개 감지</div>
+        </div>
+    </div>
+    <div style="font-size:13px;color:#667085;margin-bottom:8px;">
         책상·의자·모니터 4개가 동시에 잡히면 자동 완료됩니다.
     </div>
     {items_html}
 </div>""", unsafe_allow_html=True)
+
+
+
+class RealTimePostureProcessor(VideoProcessorBase):
+    """WebRTC 기반 실시간 자세 측정.
+    app_mobile.py의 조건(20초 안에 GOOD 5초 유지 → 환경 자동 전환 → 4개 객체 감지 완료)을 유지합니다.
+    """
+
+    POSTURE_TOTAL = 20
+    GOOD_HOLD = 5
+    REQUIRED_ENV_ITEMS = ["chair_back", "chair_seat", "desk_surface", "monitor"]
+
+    # 분석 주기: 0.30초 → 0.07초
+    # 단, 이전 분석 스레드가 끝나기 전에는 새 분석을 만들지 않아
+    # CPU 폭주 없이 가능한 한 빠르게 최신 프레임을 분석합니다.
+    ANALYZE_INTERVAL = 0.07
+
+    # 오래된 분석 오버레이 프레임을 오래 붙잡으면 카메라가 뚝뚝 끊겨 보입니다.
+    # 최신 분석 결과만 짧게 반영하고, 나머지는 현재 카메라 프레임을 그대로 출력합니다.
+    OVERLAY_FRESH_SECONDS = 0.14
+
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.started_at = None
+        self.last_analyzed_at = 0
+        self.good_streak_started_at = None
+        self.good_hold_seconds = 0
+        self.last_status = "WAIT"
+        self.last_feedback = "자세 측정 시작 버튼을 누른 뒤 측면 자세를 유지해주세요."
+        self.latest_result = None
+        self.latest_overlay = None
+        self.latest_overlay_at = 0
+        self.good_ready = False
+        self.env_ready = False
+        self.finished_bad = False
+        self.analysis_running = False
+        self.phase = "idle"
+        self.env_detected = {}
+
+    def recv(self, frame):
+        img = frame.to_ndarray(format="bgr24")
+        now = time.time()
+
+        with self.lock:
+            if self.started_at is None:
+                self.latest_overlay = img.copy()
+                return av.VideoFrame.from_ndarray(img, format="bgr24")
+
+        should_analyze = False
+        with self.lock:
+            should_analyze = (
+                now - self.last_analyzed_at >= self.ANALYZE_INTERVAL
+                and not self.finished_bad
+                and not self.env_ready
+                and not self.analysis_running
+            )
+            if should_analyze:
+                self.last_analyzed_at = now
+                self.analysis_running = True
+
+        if should_analyze:
+            threading.Thread(
+                target=self._analyze_frame_background,
+                args=(img.copy(),),
+                daemon=True,
+            ).start()
+
+        with self.lock:
+            if self.phase == "posture" and not self.good_ready and not self.finished_bad:
+                elapsed_for_finish = time.time() - self.started_at
+                if elapsed_for_finish >= self.POSTURE_TOTAL:
+                    self.finished_bad = True
+                    self.phase = "bad"
+                    self.last_status = "BAD"
+                    self.last_feedback = "20초 동안 GOOD 자세가 5초 이상 유지되지 않았습니다. 자세를 교정한 뒤 재측정해주세요."
+
+            # 카메라 화면이 1초 단위로 뚝뚝 끊기지 않도록 현재 프레임을 기본으로 사용합니다.
+            # YOLO 오버레이는 최신 분석 결과가 충분히 최근일 때만 잠깐 반영합니다.
+            # 오래된 오버레이 프레임을 계속 재사용하면 카메라가 멈춘 것처럼 보이므로 제한합니다.
+            overlay_is_fresh = (
+                self.latest_overlay is not None
+                and self.latest_overlay_at
+                and (time.time() - self.latest_overlay_at <= self.OVERLAY_FRESH_SECONDS)
+            )
+            out = self.latest_overlay.copy() if overlay_is_fresh else img.copy()
+            elapsed = 0 if self.started_at is None else min(int(time.time() - self.started_at), self.POSTURE_TOTAL)
+            remain = max(self.POSTURE_TOTAL - elapsed, 0)
+            status = self.last_status
+            phase = self.phase
+            env_detected = dict(self.env_detected)
+            good_hold = self.good_hold_seconds
+
+        h, w = out.shape[:2]
+        scale_x = w / 640.0
+        scale_y = h / 480.0
+        scale = min(scale_x, scale_y)
+        border_thickness = max(2, int(round(3 * scale)))
+        text_thickness = max(2, int(round(2 * scale)))
+
+        # 좌측 상단 GOOD/BAD 표시: 네모 박스 없이 글자만 표시
+        status_x = int(24 * scale_x)
+        status_y = int(48 * scale_y)
+        status_color = (16, 185, 129) if status == "GOOD" else (0, 0, 255) if status == "BAD" else (245, 158, 11)
+        # 가독성을 위해 얇은 흰색 외곽선만 추가하고 배경 박스는 만들지 않습니다.
+        cv2.putText(out, status, (status_x, status_y),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1.05 * scale, (255, 255, 255), max(3, text_thickness + 2))
+        cv2.putText(out, status, (status_x, status_y),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1.05 * scale, status_color, text_thickness)
+
+        # 우측 상단 시계형 타이머: 자세 단계에서만 20초 표시
+        clock_radius = max(24, int(34 * scale))
+        clock_cx = w - int(52 * scale_x)
+        clock_cy = int(52 * scale_y)
+        cv2.circle(out, (clock_cx, clock_cy), clock_radius, (255, 255, 255), -1)
+        cv2.circle(out, (clock_cx, clock_cy), clock_radius, (0, 0, 0), border_thickness)
+        knob_w = int(16 * scale)
+        knob_h = int(8 * scale)
+        cv2.rectangle(out, (clock_cx - knob_w // 2, clock_cy - clock_radius - knob_h),
+                      (clock_cx + knob_w // 2, clock_cy - clock_radius + int(2 * scale)), (0, 0, 0), -1)
+        # 타이머가 끝난 뒤에도 ENV/OK 같은 문구로 바꾸지 않고 숫자 0에 머무르게 합니다.
+        timer_text = str(remain)
+        timer_font_scale = 0.9 * scale if len(timer_text) >= 2 else 1.05 * scale
+        (tw, th), _ = cv2.getTextSize(timer_text, cv2.FONT_HERSHEY_SIMPLEX, timer_font_scale, text_thickness)
+        cv2.putText(out, timer_text, (clock_cx - tw // 2, clock_cy + th // 2),
+                    cv2.FONT_HERSHEY_SIMPLEX, timer_font_scale, (0, 0, 0), text_thickness)
+
+        # 하단 GOOD 유지 진행바
+        if phase == "posture" and good_hold > 0:
+            ratio = min(good_hold / self.GOOD_HOLD, 1.0)
+            bar_x1, bar_y1 = int(24 * scale_x), h - int(42 * scale_y)
+            bar_x2, bar_y2 = w - int(24 * scale_x), h - int(22 * scale_y)
+            cv2.rectangle(out, (bar_x1, bar_y1), (bar_x2, bar_y2), (40, 40, 40), -1)
+            cv2.rectangle(out, (bar_x1, bar_y1), (bar_x1 + int((bar_x2 - bar_x1) * ratio), bar_y2), (16, 185, 129), -1)
+            cv2.putText(out, f"GOOD {good_hold:.1f}s/{self.GOOD_HOLD}s", (bar_x1, bar_y1 - int(8 * scale_y)),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.55 * scale, (16, 185, 129), max(1, text_thickness - 1))
+
+        # 환경 단계 안내
+        if phase == "environment":
+            items_kr = {"chair_back": "chair back", "chair_seat": "seat", "desk_surface": "desk", "monitor": "monitor"}
+            base_y = int(92 * scale_y)
+            for i, key in enumerate(self.REQUIRED_ENV_ITEMS):
+                ok = key in env_detected
+                color = (16, 185, 129) if ok else (150, 150, 150)
+                label = f"{'OK' if ok else '--'} {items_kr[key]}"
+                cv2.putText(out, label, (int(18 * scale_x), base_y + int(i * 26 * scale_y)),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.55 * scale, color, max(1, text_thickness - 1))
+
+        return av.VideoFrame.from_ndarray(out, format="bgr24")
+
+    def _analyze_frame_background(self, img):
+        try:
+            rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            result = analyze_image(Image.fromarray(rgb))
+            now = time.time()
+
+            with self.lock:
+                if self.started_at is None or self.finished_bad or self.env_ready:
+                    return
+
+                if isinstance(result, dict) and result.get("ok"):
+                    self.latest_result = result
+
+                    # [방법 B] 카메라 오버레이는 draw_posture_overlay() 사용
+                    # → analyze_image()의 큰 점/선(overlay) 대신
+                    #   jasee_core의 작은 점/선으로 그린 카메라 전용 오버레이 적용
+                    metrics = result.get("metrics", {})
+                    kp_raw  = result.get("keypoints_raw")
+                    if kp_raw is not None:
+                        cam_overlay = draw_posture_overlay(img, kp_raw, metrics)
+                        self.latest_overlay = cam_overlay
+                        self.latest_overlay_at = time.time()
+
+                if self.phase == "posture":
+                    if isinstance(result, dict) and result.get("ok") and result.get("gate_pass", False):
+                        if self.good_streak_started_at is None:
+                            self.good_streak_started_at = now
+                        self.good_hold_seconds = now - self.good_streak_started_at
+                        self.last_status = "GOOD"
+                        self.last_feedback = f"GOOD 자세 유지 중: {self.good_hold_seconds:.1f}초 / {self.GOOD_HOLD}초"
+
+                        if self.good_hold_seconds >= self.GOOD_HOLD:
+                            self.good_ready = True
+                            self.phase = "environment"
+                            self.last_feedback = "GOOD 자세 유지 완료. 작업환경 측정으로 자동 전환되었습니다."
+                    else:
+                        self.good_streak_started_at = None
+                        self.good_hold_seconds = 0
+                        self.last_status = "BAD"
+                        if isinstance(result, dict) and result.get("gate_bad_items"):
+                            self.last_feedback = " / ".join(result.get("gate_bad_items", [])[:2])
+                        elif isinstance(result, dict):
+                            self.last_feedback = result.get("message", "자세가 BAD로 판정되었습니다.")
+                        else:
+                            self.last_feedback = "자세가 BAD로 판정되었습니다."
+
+                elif self.phase == "environment":
+                    detected = result.get("env_detected", {}) if isinstance(result, dict) else {}
+                    self.env_detected = detected or {}
+                    if all(item in self.env_detected for item in self.REQUIRED_ENV_ITEMS):
+                        self.env_ready = True
+                        self.phase = "stopped"
+                        self.last_status = "GOOD"
+                        self.last_feedback = "작업환경 인식 완료. 기록하기를 눌러 측정 이력에 저장하세요."
+                    else:
+                        found = sum(1 for item in self.REQUIRED_ENV_ITEMS if item in self.env_detected)
+                        self.last_status = "GOOD"
+                        self.last_feedback = f"작업환경 인식 중입니다. {found}/4개 감지됨."
+        finally:
+            with self.lock:
+                self.analysis_running = False
+
+    def snapshot(self):
+        with self.lock:
+            return {
+                "started_at": self.started_at,
+                "elapsed": 0 if self.started_at is None else min(time.time() - self.started_at, self.POSTURE_TOTAL),
+                "good_hold_seconds": self.good_hold_seconds,
+                "last_status": self.last_status,
+                "last_feedback": self.last_feedback,
+                "latest_result": self.latest_result,
+                "good_ready": self.good_ready,
+                "env_ready": self.env_ready,
+                "finished_bad": self.finished_bad,
+                "phase": self.phase,
+                "env_detected": dict(self.env_detected),
+            }
+
+    def start(self):
+        with self.lock:
+            self.started_at = time.time()
+            self.last_analyzed_at = 0
+            self.good_streak_started_at = None
+            self.good_hold_seconds = 0
+            self.last_status = "WAIT"
+            self.last_feedback = "20초 안에 GOOD 자세를 5초 이상 유지해주세요."
+            self.latest_result = None
+            self.latest_overlay = None
+            self.latest_overlay_at = 0
+            self.good_ready = False
+            self.env_ready = False
+            self.finished_bad = False
+            self.analysis_running = False
+            self.phase = "posture"
+            self.env_detected = {}
+
+    def reset(self):
+        with self.lock:
+            self.started_at = None
+            self.last_analyzed_at = 0
+            self.good_streak_started_at = None
+            self.good_hold_seconds = 0
+            self.last_status = "WAIT"
+            self.last_feedback = "재측정 준비 완료. 자세 측정 시작 버튼을 눌러주세요."
+            self.latest_result = None
+            self.latest_overlay = None
+            self.latest_overlay_at = 0
+            self.good_ready = False
+            self.env_ready = False
+            self.finished_bad = False
+            self.analysis_running = False
+            self.phase = "idle"
+            self.env_detected = {}
 
 
 def render_measure():
@@ -4244,7 +5359,8 @@ def render_measure():
 
     if analysis_tab == "1. 실시간 자세 분석":
         st.markdown("### 1. 실시간 자세 분석")
-        st.markdown("""
+        st.markdown(
+            """
 <div class="fit-card">
     <div class="fit-card-title">
         <span>측정 흐름</span>
@@ -4255,328 +5371,154 @@ def render_measure():
         작업환경 측정 자동 전환 → 책상·의자·모니터 4개 동시 감지 완료 → <b>기록하기</b><br>
         20초 안에 GOOD이 안 나오면 BAD로 저장 후 재측정 안내
     </div>
-</div>""", unsafe_allow_html=True)
+</div>
+""",
+            unsafe_allow_html=True,
+        )
 
-        # ── OpenCV 기반 실시간 측정 ──────────────────────────
-        defaults = dict(phase="posture", good_start=None, env_bboxes={},
-                        running=False, last_posture=None, last_metrics={},
-                        good_hold_seconds=0, finished_bad=False,
-                        latest_result=None, latest_keypoints=None,
-                        env_detected={})
-        for k, v in defaults.items():
-            if k not in st.session_state:
-                st.session_state[k] = v
+        camera_type = st.radio(
+            "카메라 선택",
+            ["전면 카메라", "후면 카메라"],
+            horizontal=True,
+            key="realtime_camera_type",
+        )
+        facing_mode = "user" if camera_type == "전면 카메라" else "environment"
 
-        POSTURE_TOTAL = 20
-        GOOD_HOLD     = 5
-        ARROW_COL     = (255, 100, 0)
+        media_stream_constraints = {
+            "video": {
+                "facingMode": {"ideal": facing_mode},
+                # 해상도를 낮추고 FPS를 높여 WebRTC 프리뷰가 더 부드럽게 나오도록 조정
+                "width": {"ideal": 480, "max": 640},
+                "height": {"ideal": 360, "max": 480},
+                "frameRate": {"ideal": 60, "max": 60},
+            },
+            "audio": False,
+        }
+
+        webrtc_kwargs = dict(
+            key=f"realtime-posture-{facing_mode}",
+            media_stream_constraints=media_stream_constraints,
+            rtc_configuration=RTC_CONFIGURATION,
+            video_processor_factory=RealTimePostureProcessor,
+            async_processing=True,
+        )
+        if WebRtcMode is not None:
+            webrtc_kwargs["mode"] = WebRtcMode.SENDRECV
+
+        try:
+            ctx = webrtc_streamer(**webrtc_kwargs)
+        except TypeError:
+            webrtc_kwargs.pop("mode", None)
+            webrtc_kwargs.pop("rtc_configuration", None)
+            ctx = webrtc_streamer(**webrtc_kwargs)
+
+        processor = ctx.video_processor if ctx else None
 
         c1, c2, c3 = st.columns([1, 1, 1])
         with c1:
-            start_btn = st.button("▶ 자세 측정 시작", use_container_width=True,
-                                  key="rt_start_btn", type="primary")
+            start_btn = st.button("▶ 자세 측정 시작", use_container_width=True, key="rt_start_btn", type="primary")
         with c2:
-            stop_btn  = st.button("⏹ STOP", use_container_width=True, key="rt_stop_btn")
+            stop_btn = st.button("⏹ STOP", use_container_width=True, key="rt_stop_btn")
         with c3:
             retry_btn = st.button("🔄 재측정", use_container_width=True, key="rt_retry_btn")
 
+        if processor is None:
+            st.info(
+                "카메라 권한을 허용한 뒤에도 로딩만 계속되면, 브라우저 주소가 https 또는 localhost인지 확인하고 "
+                "카메라를 사용하는 다른 앱/탭을 닫은 다음 다시 Start를 눌러주세요."
+            )
+            return
+
         if start_btn:
-            st.session_state.phase            = "posture"
-            st.session_state.running          = True
-            st.session_state.good_start       = None
-            st.session_state.good_hold_seconds = 0
-            st.session_state.finished_bad     = False
-            st.session_state.latest_result    = None
-            st.session_state.latest_keypoints = None
-            st.session_state.env_detected     = {}
-            st.session_state.rt_ready_result  = None
-            st.session_state.rt_saved         = False
+            processor.start()
+            st.session_state.rt_phase = "counting"
+            st.session_state.rt_ready_result = None
+            st.session_state.rt_saved = False
             speak("측정을 시작합니다. 측면을 카메라에 맞춰주세요.")
 
         if retry_btn:
-            for k, v in defaults.items():
-                st.session_state[k] = v
+            processor.reset()
+            st.session_state.rt_phase = "idle"
+            st.session_state.rt_ready_result = None
+            st.session_state.rt_saved = False
             st.rerun()
 
-        if stop_btn:
-            st.session_state.running = False
+        snapshot = processor.snapshot()
+        if snapshot.get("started_at") is not None and st.session_state.get("rt_phase") not in ["stopped", "saved"]:
+            _render_realtime_feedback_card(snapshot)
 
-        # 피드백 카드
-        phase = st.session_state.phase
-        if st.session_state.running or st.session_state.finished_bad:
-            _render_realtime_feedback_card({
-                "phase":             phase,
-                "last_status":       st.session_state.get("last_posture", "WAIT"),
-                "elapsed":           0,
-                "good_hold_seconds": st.session_state.good_hold_seconds,
-                "last_feedback":     "",
-                "env_detected":      st.session_state.env_detected,
-            })
+        if snapshot.get("good_ready") and not snapshot.get("env_ready") and not snapshot.get("finished_bad"):
+            st.success("5초 이상 GOOD 자세가 유지되었습니다. 작업환경 측정으로 자동 전환되었습니다.")
 
-        frame_box    = st.empty()
-        status_box   = st.empty()
-        progress_box = st.empty()
-
-        # BAD 안내 문구
-        if st.session_state.finished_bad:
-            st.markdown("""
-<div class="fit-card" style="border-left:6px solid #D94A4A;background:linear-gradient(135deg,#FFF1F1,#fff);">
-    <div class="fit-card-title">
-        <span>자세 측정 결과</span>
-        <span class="fit-badge badge-red">BAD</span>
-    </div>
-    <div style="font-size:14px;line-height:1.9;color:#172033;">
-        아쉽게도 20초 동안 GOOD 자세가 유지되지 않았어요.<br>
-        <b>파란 화살표 방향대로 자세를 교정</b>해주세요.<br>
-        교정 후 재측정하면 작업환경 측정까지 진행할 수 있어요!
-    </div>
-</div>""", unsafe_allow_html=True)
-            result = st.session_state.latest_result
-            if result and result.get("overlay") is not None:
-                st.image(result["overlay"],
-                         caption="BAD 자세 — 파란 화살표 방향으로 교정해주세요",
-                         use_container_width=True)
-            if result and result.get("ok"):
+        if snapshot.get("env_ready"):
+            result = snapshot.get("latest_result")
+            if result:
+                result["source"] = "실시간 자세 분석"
                 st.session_state.rt_ready_result = result
-                st.session_state.rt_phase        = "stopped"
+                if st.session_state.get("rt_phase") not in ["stopped", "saved"]:
+                    st.session_state.rt_phase = "stopped"
+                st.success("작업환경 인식이 완료되었습니다. 아래 기록하기 버튼을 눌러 저장하세요.")
 
-        # OpenCV 카메라 루프
-        if st.session_state.running:
-            cap        = cv2.VideoCapture(0)
-            start_time = time.time()
-            out_frame  = {"result": None, "metrics": {}, "keypoints": {}, "gate_pass": False}
+        if stop_btn:
+            snap = processor.snapshot()
+            result = snap.get("latest_result") or st.session_state.get("rt_ready_result")
+            if result and (snap.get("env_ready") or snap.get("good_ready")):
+                result["source"] = "실시간 자세 분석"
+                st.session_state.rt_phase = "stopped"
+                st.session_state.rt_ready_result = result
+                st.success("측정이 정지되었습니다. 아래 기록하기 버튼을 누르면 현재 오버레이 이미지와 함께 측정 이력에 저장됩니다.")
+            else:
+                st.warning("아직 GOOD 5초 유지 조건이 충족되지 않았습니다. 조건 충족 후 STOP을 눌러주세요.")
 
-            while st.session_state.running:
-                ret, frame = cap.read()
-                if not ret:
-                    st.warning("카메라를 찾을 수 없어요.")
-                    break
+        if snapshot.get("finished_bad"):
+            st.error("20초 동안 GOOD 자세가 5초 이상 유지되지 않아 작업환경 측정으로 전환하지 않았습니다.")
+            bad_result = snapshot.get("latest_result")
+            if bad_result and bad_result.get("overlay") is not None:
+                st.image(bad_result["overlay"], use_container_width=True, caption="BAD 자세 — 파란 화살표 방향으로 교정해주세요")
+            if bad_result and bad_result.get("ok"):
+                st.session_state.rt_ready_result = bad_result
+                st.session_state.rt_phase = "stopped"
+            st.info("재측정 버튼을 누르면 20초 측정을 다시 시작할 수 있습니다.")
 
-                frame   = cv2.flip(frame, 1)
-                elapsed = time.time() - start_time
-                now     = time.time()
-                h, w    = frame.shape[:2]
-
-                # ── 자세 측정 단계 ──
-                if phase == "posture":
-                    # 매 프레임 포즈 그리기
-                    try:
-                        pose_results = _pose_yolo(frame, verbose=False)
-                        for r in pose_results:
-                            if r.keypoints is None: continue
-                            for kp_data in r.keypoints.data:
-                                if kp_data.shape[0] < 17: continue
-                                kp = kp_data.cpu().numpy()
-                                st.session_state.latest_keypoints = kp
-
-                                # 지표별 색상
-                                res = st.session_state.latest_result
-                                def gc(kr):
-                                    if res:
-                                        all_d = {**res.get("posture",{}), **res.get("env",{})}
-                                        if kr in all_d:
-                                            _, ok, raw = all_d[kr]
-                                            if raw is not None:
-                                                return (29,158,117) if ok else (220,50,50)
-                                    return (180,180,180)
-
-                                cva_c  = gc("CVA"); tia_c = gc("TIA")
-                                knee_c = gc("무릎"); wrist_c = gc("손목")
-                                d_col  = (180,180,180)
-
-                                SKELETON = [(0,1),(0,2),(1,3),(2,4),(5,6),
-                                            (5,7),(7,9),(6,8),(8,10),(5,11),
-                                            (6,12),(11,12),(11,13),(13,15),(12,14),(14,16)]
-                                COLORED = {
-                                    (3,5):cva_c,(4,6):cva_c,
-                                    (5,11):tia_c,(6,12):tia_c,(11,12):tia_c,(5,6):tia_c,
-                                    (11,13):knee_c,(12,14):knee_c,(13,15):knee_c,(14,16):knee_c,
-                                    (7,9):wrist_c,(8,10):wrist_c,
-                                    (5,7):d_col,(6,8):d_col,
-                                }
-                                KP_C = {0:d_col,1:d_col,2:d_col,3:cva_c,4:cva_c,
-                                        5:tia_c,6:tia_c,7:wrist_c,8:wrist_c,
-                                        9:wrist_c,10:wrist_c,11:tia_c,12:tia_c,
-                                        13:knee_c,14:knee_c,15:knee_c,16:knee_c}
-
-                                for a,b in SKELETON:
-                                    if kp[a][2]<0.3 or kp[b][2]<0.3: continue
-                                    lc = COLORED.get((a,b), d_col)
-                                    cv2.line(frame,(int(kp[a][0]),int(kp[a][1])),
-                                             (int(kp[b][0]),int(kp[b][1])),(0,0,0),8)
-                                    cv2.line(frame,(int(kp[a][0]),int(kp[a][1])),
-                                             (int(kp[b][0]),int(kp[b][1])),lc,4)
-                                for idx in range(17):
-                                    if kp[idx][2]<0.3: continue
-                                    c = KP_C.get(idx, d_col)
-                                    px,py = int(kp[idx][0]),int(kp[idx][1])
-                                    if c == (220,50,50):
-                                        cv2.circle(frame,(px,py),10,c,-1)
-                                        cv2.circle(frame,(px,py),14,(255,255,255),2)
-                                    else:
-                                        cv2.circle(frame,(px,py),8,c,-1)
-                                        cv2.circle(frame,(px,py),11,(255,255,255),2)
-                                break
-                            break
-                    except Exception:
-                        pass
-
-                    # 1초마다 판정
-                    if elapsed - int(elapsed) < 0.1:
-                        try:
-                            rgb    = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                            result = analyze_image(Image.fromarray(rgb))
-                            st.session_state.latest_result = result
-                            if result.get("ok") and result.get("gate_pass", False):
-                                st.session_state.last_posture = "GOOD"
-                                if st.session_state.good_start is None:
-                                    st.session_state.good_start = now
-                                st.session_state.good_hold_seconds = now - st.session_state.good_start
-                                if st.session_state.good_hold_seconds >= GOOD_HOLD:
-                                    st.session_state.phase   = "env_transition"
-                                    st.session_state.running = False
-                                    speak("자세 완료! 작업환경을 측정합니다.")
-                                    cap.release()
-                                    break
-                            else:
-                                st.session_state.last_posture      = "BAD"
-                                st.session_state.good_start        = None
-                                st.session_state.good_hold_seconds = 0
-                        except Exception:
-                            pass
-
-                    # 타임아웃
-                    if elapsed >= POSTURE_TOTAL:
-                        result = st.session_state.latest_result
-                        if result:
-                            st.session_state.finished_bad  = True
-                            st.session_state.latest_result = result
-                        st.session_state.running = False
-                        speak("시간 종료. 재측정해주세요.")
-                        cap.release()
-                        break
-
-                    # 상태바
-                    status = st.session_state.get("last_posture","WAIT")
-                    remain = max(POSTURE_TOTAL - elapsed, 0)
-                    color  = (29,158,117) if status=="GOOD" else (220,50,50) if status=="BAD" else (165,95,24)
-                    ov = frame.copy()
-                    cv2.rectangle(ov,(0,0),(w,50),color,-1)
-                    cv2.addWeighted(ov,0.75,frame,0.25,0,frame)
-                    cv2.putText(frame,f"Posture: {status}",(15,33),
-                                cv2.FONT_HERSHEY_SIMPLEX,1.,(255,255,255),2)
-                    cv2.putText(frame,f"Time: {remain:.0f}s",(w-130,33),
-                                cv2.FONT_HERSHEY_SIMPLEX,0.7,(255,255,255),2)
-                    hold = st.session_state.good_hold_seconds
-                    if status=="GOOD" and hold>0:
-                        ratio = min(hold/GOOD_HOLD,1.)
-                        bw = int((w-40)*ratio)
-                        cv2.rectangle(frame,(20,h-40),(w-20,h-20),(40,40,40),-1)
-                        cv2.rectangle(frame,(20,h-40),(20+bw,h-20),(29,158,117),-1)
-                        cv2.putText(frame,f"GOOD: {hold:.1f}s/{GOOD_HOLD}s",
-                                    (20,h-45),cv2.FONT_HERSHEY_SIMPLEX,0.55,(29,158,117),2)
-
-                # ── 환경 측정 단계 ──
-                elif phase == "environment":
-                    try:
-                        _kp_raw  = st.session_state.get("latest_keypoints")
-                        env_out  = run_environment(frame, _env_yolo, pose_keypoints=_kp_raw)
-                        detected = env_out.get("detected",{})
-                        bboxes   = env_out.get("bboxes",{})
-                        st.session_state.env_detected     = detected
-                        st.session_state.env_bboxes       = bboxes
-
-                        for label, bbox in bboxes.items():
-                            x1,y1,x2,y2 = bbox
-                            cls   = [k for k,v in ENV_CLASSES.items() if v==label]
-                            c     = ENV_COLORS.get(cls[0],(200,200,200)) if cls else (200,200,200)
-                            cv2.rectangle(frame,(x1,y1),(x2,y2),c,2)
-                            cv2.rectangle(frame,(x1,y1-22),(x2,y1),c,-1)
-                            cv2.putText(frame,f"{label}",(x1+3,y1-5),
-                                        cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,0),2)
-                        items_kr = {"chair_back":"등받이","chair_seat":"의자시트",
-                                    "desk_surface":"책상","monitor":"모니터"}
-                        for i,(item,lbl) in enumerate(items_kr.items()):
-                            ok = item in detected
-                            c  = (29,158,117) if ok else (120,120,120)
-                            cv2.putText(frame,f"{'v' if ok else 'o'} {lbl}",
-                                        (15,70+i*28),cv2.FONT_HERSHEY_SIMPLEX,0.65,c,2)
-
-                        if all(i in detected for i in ["chair_back","chair_seat","desk_surface","monitor"]):
-                            result = st.session_state.latest_result
-                            if result:
-                                result["source"] = "실시간 자세 분석"
-                                st.session_state.rt_ready_result = result
-                                st.session_state.rt_phase        = "stopped"
-                            speak("환경 인식 완료. 측정을 종료합니다.")
-                            st.session_state.running = False
-                            cap.release()
-                            st.balloons()
-                            break
-                    except Exception:
-                        pass
-
-                    ov = frame.copy()
-                    cv2.rectangle(ov,(0,0),(w,50),(13,110,90),-1)
-                    cv2.addWeighted(ov,0.75,frame,0.25,0,frame)
-                    cv2.putText(frame,"Environment Scan",(15,33),
-                                cv2.FONT_HERSHEY_SIMPLEX,1.,(255,255,255),2)
-
-                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                frame_box.image(frame_rgb, channels="RGB", use_container_width=True)
-
-            if cap.isOpened():
-                cap.release()
-
-        # 환경 측정 전환 (민트 화면)
-        if st.session_state.phase == "env_transition":
-            st.markdown("""
-<div style="background:#1D9E75;padding:32px;border-radius:14px;text-align:center;color:white;">
-    <div style="font-size:1.5rem;font-weight:800;margin-bottom:12px;">✅ GOOD 자세 유지 완료!</div>
-    <div style="font-size:1rem;line-height:1.8;">
-        이제 작업환경을 측정합니다.<br>
-        카메라에 책상 / 의자 / 모니터가<br>
-        모두 보이도록 위치를 조정해주세요.
-    </div>
-</div>""", unsafe_allow_html=True)
-            if st.button("▶ 작업환경 측정 시작", use_container_width=True, type="primary"):
-                st.session_state.phase   = "environment"
-                st.session_state.running = True
-                st.rerun()
-
-        # 결과 표시
         result_to_show = st.session_state.get("rt_ready_result")
         if result_to_show and result_to_show.get("ok"):
             st.markdown("---")
-            st.markdown("### 📊 측정 결과")
-            good  = result_to_show.get("good_count", 0)
+            st.markdown("### 📊 실시간 자세 오버레이 및 통합 결과")
+            good = result_to_show.get("good_count", 0)
             total = result_to_show.get("total_count", 0)
-            rate  = round(good/total*100) if total else 0
-            c1,c2,c3,c4 = st.columns(4)
-            with c1: metric_card(result_to_show.get("score",0), "종합 자세 점수", "#2563EB")
-            with c2: metric_card(result_to_show.get("risk","-"), "위험도", "#F59E0B")
-            with c3: metric_card(f"{good}/{total}", "양호 지표", "#10B981")
-            with c4: metric_card(f"{rate}%", "정상 범위 비율", "#6366F1")
-            img_col, summary_col = st.columns([1.05, 0.95])
-            with img_col:
-                overlay = result_to_show.get("overlay")
-                if overlay is not None:
-                    caption = "자세 오버레이" if result_to_show.get("gate_pass") else                               "BAD 자세 — 파란 화살표 방향으로 교정해주세요"
-                    st.image(overlay, use_container_width=True, caption=caption)
-            with summary_col:
-                correction_html = build_ai_correction_comment(result_to_show)
-                components.html(correction_html, height=650, scrolling=True)
-            if st.session_state.get("rt_phase") in ("stopped","saved","ready"):
+            rate = round(good / total * 100) if total else 0
+            c1, c2, c3, c4 = st.columns(4)
+            with c1:
+                metric_card(result_to_show.get("score", 0), "종합 자세 점수", "#2563EB")
+            with c2:
+                metric_card(result_to_show.get("risk", "-"), "위험도", "#F59E0B")
+            with c3:
+                metric_card(f"{good}/{total}", "양호 지표", "#10B981")
+            with c4:
+                metric_card(f"{rate}%", "정상 범위 비율", "#6366F1")
+
+            # 실시간 결과창에서는 "오늘의 실천 목표" 카드와 iframe 고정 높이로 생기던
+            # 큰 여백을 렌더링하지 않고, 오버레이 이미지만 표시합니다.
+            overlay = result_to_show.get("overlay")
+            if overlay is not None:
+                caption = "실시간 자세 오버레이" if result_to_show.get("gate_pass") else "BAD 자세 — 파란 화살표 방향으로 교정해주세요"
+                st.image(overlay, use_container_width=True, caption=caption)
+
+            if st.session_state.get("rt_phase") in ["stopped", "saved"]:
                 if st.button("💾 기록하기", use_container_width=True, key="rt_save_history_btn"):
                     if not st.session_state.get("rt_saved"):
+                        result_to_show["source"] = result_to_show.get("source", "실시간 자세 분석")
                         st.session_state.latest_result = result_to_show
                         save_history(result_to_show)
                         sync_result_to_challenge(result_to_show)
                         st.session_state.rt_saved = True
                         st.session_state.rt_phase = "saved"
-                        st.success("✅ 측정 이력, 챌린지 포인트에 기록되었습니다!")
+                        st.success("✅ 측정 이력과 바른자세 챌린지 포인트에 기록되었습니다.")
                     else:
                         st.info("이미 기록된 측정 결과입니다.")
+            else:
+                st.info("작업환경 4개 객체가 모두 감지되거나 STOP을 누르면 기록할 수 있습니다.")
+
             render_pretty_7_metric_dashboard(result_to_show)
 
         return
@@ -7305,7 +8247,7 @@ def make_musculoskeletal_report_pdf(result):
     username = st.session_state.get("username", "익명")
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 
-    story.append(Paragraph("Fit Me Up 근골격계 리포트", styles["KTitle"]))
+    story.append(Paragraph("자세히봐 근골격계 리포트", styles["KTitle"]))
     story.append(
         Paragraph(
             f"사용자: {username}  |  생성일시: {now}<br/>"
@@ -7478,6 +8420,9 @@ with page_placeholder.container():
 
     if menu == "📸 자세측정":
         render_measure()
+    
+    elif menu == "💬 AI 챗봇":
+        render_mobile_chatbot()
         
     elif menu == "🧘 운동 및 스트레칭 추천":
         render_exercise_recommendation_page()
@@ -7495,3 +8440,211 @@ with page_placeholder.container():
         render_posture_challenge()
     elif menu == "🛒 제품 추천":
         render_product_recommendation_page()
+
+# 챗봇 입력 영역 최종 정렬 오버라이드
+st.markdown(
+    """
+<style>
+/* ===== JASEE Chatbot final clean layout ===== */
+div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) {
+    max-width: 420px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* Streamlit가 빈 마커용 element-container를 높이로 잡지 않게 처리 */
+div[data-testid="stElementContainer"]:has(.jasee-chatbox-clean-scope) {
+    height: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+/* 상담 유형 영역 */
+div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) [data-testid="stSelectbox"] {
+    width: 100% !important;
+    margin: 12px 0 0 0 !important;
+    padding: 18px 16px 14px 16px !important;
+    background: #FFFFFF !important;
+    border: 1px solid #D7E6F8 !important;
+    border-bottom: 0 !important;
+    border-radius: 22px 22px 0 0 !important;
+    box-shadow: 0 10px 28px rgba(37, 99, 235, 0.06) !important;
+    box-sizing: border-box !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) [data-testid="stSelectbox"] > label {
+    display: block !important;
+    margin: 0 0 8px 0 !important;
+    padding: 0 !important;
+    color: #172033 !important;
+    font-size: 13px !important;
+    font-weight: 900 !important;
+    line-height: 1.2 !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) [data-testid="stSelectbox"] div[data-baseweb="select"] {
+    width: 100% !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) [data-testid="stSelectbox"] div[data-baseweb="select"] > div {
+    height: 50px !important;
+    min-height: 50px !important;
+    width: 100% !important;
+    background: #FFFFFF !important;
+    border: 1px solid #CFE0F5 !important;
+    border-radius: 16px !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) [data-testid="stSelectbox"] div[data-baseweb="select"] span,
+div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) [data-testid="stSelectbox"] div[data-baseweb="select"] div {
+    color: #0F1E36 !important;
+    font-size: 15px !important;
+    font-weight: 900 !important;
+}
+
+/* 입력 카드: 상담 유형과 같은 외곽 너비 */
+div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) [data-testid="stForm"] {
+    width: 100% !important;
+    margin: 0 0 14px 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) [data-testid="stForm"] form {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 16px !important;
+    background: #FFFFFF !important;
+    border: 1px solid #D7E6F8 !important;
+    border-top: 1px solid #EEF4FB !important;
+    border-radius: 0 0 22px 22px !important;
+    box-shadow: 0 18px 36px rgba(37, 99, 235, 0.08) !important;
+    box-sizing: border-box !important;
+}
+
+/* 입력창 + 버튼 한 줄 정렬 */
+div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) [data-testid="stForm"] div[data-testid="stHorizontalBlock"] {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) [data-testid="stForm"] div[data-testid="column"] {
+    width: auto !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) [data-testid="stForm"] div[data-testid="column"]:last-child {
+    flex: 0 0 52px !important;
+    width: 52px !important;
+    min-width: 52px !important;
+    max-width: 52px !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) [data-testid="stForm"] [data-testid="stTextInput"] {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) [data-testid="stForm"] [data-testid="stTextInput"] input {
+    width: 100% !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    margin: 0 !important;
+    padding: 0 16px !important;
+    background: #F7FAFE !important;
+    border: 1px solid #E5EEF8 !important;
+    border-radius: 14px !important;
+    color: #172033 !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) [data-testid="stForm"] [data-testid="stTextInput"] input:focus {
+    border-color: #2563EB !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+    outline: none !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) [data-testid="stFormSubmitButton"] {
+    width: 52px !important;
+    height: 48px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) [data-testid="stFormSubmitButton"] button {
+    width: 52px !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 14px !important;
+    background: linear-gradient(135deg, #2563EB, #1D4ED8) !important;
+    color: #FFFFFF !important;
+    font-size: 18px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.26) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) [data-testid="stFormSubmitButton"] button p {
+    font-size: 18px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) [data-testid="stFormSubmitButton"] button:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.34) !important;
+}
+
+@media (max-width: 700px) {
+    div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) {
+        max-width: calc(100vw - 32px) !important;
+    }
+
+    div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) [data-testid="stForm"] div[data-testid="stHorizontalBlock"] {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+    }
+
+    div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) [data-testid="stForm"] div[data-testid="column"] {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        width: auto !important;
+    }
+
+    div[data-testid="stVerticalBlock"]:has(.jasee-chatbox-clean-scope) [data-testid="stForm"] div[data-testid="column"]:last-child {
+        flex: 0 0 52px !important;
+        width: 52px !important;
+        min-width: 52px !important;
+        max-width: 52px !important;
+    }
+}
+</style>
+""",
+    unsafe_allow_html=True,
+)

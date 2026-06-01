@@ -1,0 +1,68 @@
+{
+  "tia_to_rula_mapping": [
+    {
+      "tia_range": "0° ~ 10°",
+      "rula_trunk_zone": 0,
+      "result": "Good",
+      "feedback_short": "척추가 거의 수직입니다. 최적 자세입니다.",
+      "vdt_ref": "제6조 4항"
+    },
+    {
+      "tia_range": "10° ~ 20°",
+      "rula_trunk_zone": 1,
+      "result": "Good",
+      "feedback_short": "척추가 약간 기울었으나 허용 범위입니다.",
+      "vdt_ref": "제6조 4항"
+    },
+    {
+      "tia_range": "20° ~ 60°",
+      "rula_trunk_zone": 2,
+      "result": "Bad",
+      "feedback_short": "몸통이 과도하게 앞으로 굽혀진 상태입니다. 등받이에 기대세요.",
+      "vdt_ref": "제6조 4항"
+    },
+    {
+      "tia_range": "60° 초과",
+      "rula_trunk_zone": 3,
+      "result": "Bad",
+      "feedback_short": "심각한 전굴 자세입니다. 즉시 자세를 교정하세요.",
+      "vdt_ref": "제6조 4항"
+    }
+  ],
+  "cva_to_rula_mapping": [
+    {
+      "cva_range": "0° ~ 10°",
+      "rula_neck_zone": 0,
+      "result": "Good",
+      "feedback_short": "목이 수직에 가깝습니다. 이상적인 경추 자세입니다.",
+      "vdt_ref": "제6조 1항"
+    },
+    {
+      "cva_range": "10° ~ 20°",
+      "rula_neck_zone": 1,
+      "result": "Good",
+      "feedback_short": "목이 약간 앞으로 기울었으나 허용 범위입니다.",
+      "vdt_ref": "제6조 1항"
+    },
+    {
+      "cva_range": "20° 초과",
+      "rula_neck_zone": 2,
+      "result": "Bad",
+      "feedback_short": "거북목(FHP) 의심. 모니터 높이를 눈높이에 맞게 올리세요.",
+      "vdt_ref": "제6조 1항"
+    },
+    {
+      "cva_range": "20° 초과 + 비틀림",
+      "rula_neck_zone": 3,
+      "result": "Bad",
+      "feedback_short": "목이 심하게 기울고 비틀려 있습니다. 즉시 자세를 교정하세요.",
+      "vdt_ref": "제6조 1항"
+    }
+  ],
+  "posture_feedback_templates": {
+    "all_good": "✓ 현재 자세의 모든 지표가 기준을 충족합니다. 이 자세를 유지하면서 1시간마다 스트레칭을 병행하세요.",
+    "one_bad": "⚠ {indicator} 지표가 기준을 벗어났습니다. 아래 교정 방법을 따라 해보세요.",
+    "multiple_bad": "⚠ {count}개 지표({indicators})가 기준을 벗어났습니다. 우선순위가 높은 항목부터 순서대로 교정하세요.",
+    "priority_order": ["CVA", "TIA", "의자-등받이 거리", "모니터 시선각", "팔꿈치 각도", "작업대 높이", "체간-책상거리", "무릎 각도", "손목 각도"]
+  }
+}

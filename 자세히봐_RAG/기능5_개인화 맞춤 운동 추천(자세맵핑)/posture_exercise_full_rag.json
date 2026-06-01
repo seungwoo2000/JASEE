@@ -1,0 +1,694 @@
+{
+  "meta": {
+    "version": "2.0",
+    "description": "자세 패턴별 단축근/약화근 타겟 운동법 + 스트레칭 완성 RAG 데이터셋",
+    "patterns_covered": ["UCS", "LCS", "FlatBack", "SwayBack"],
+    "structure": "pattern > muscle_type(tight/weak) > muscle > intervention(stretch/exercise)",
+    "rag_chunk_unit": "각 muscle 항목 = 1 RAG 청크",
+    "service_trigger": "측정값(각도/거리/비대칭) → 패턴 감지 → 해당 청크 retrieval"
+  },
+
+  "patterns": [
+
+    {
+      "pattern_id": "UCS",
+      "pattern_name": "Upper Crossed Syndrome",
+      "pattern_name_ko": "상부 교차 증후군",
+      "description": "흉근·상부승모근 단축 + 심부경굴근·능형근 약화로 인한 두부전방이동 및 어깨 전방경사 패턴",
+      "measurement_triggers": {
+        "forward_head_cm": "> 2.5",
+        "neck_angle_deg": "> 45",
+        "shoulder_protraction": true,
+        "thoracic_kyphosis_deg": "> 45"
+      },
+
+      "tight_muscles": [
+
+        {
+          "muscle_id": "UCS-T-01",
+          "muscle": "대흉근 (Pectoralis Major)",
+          "role_in_dysfunction": "어깨 전방경사·내회전 유발, 흉추 신전 제한",
+          "interventions": {
+            "stretching": [
+              {
+                "name": "Doorway Pec Stretch",
+                "name_ko": "문틈 대흉근 스트레칭",
+                "type": "static_stretch",
+                "position": "문틈에 서서 팔꿈치 90° 벽에 고정, 체중을 앞으로 이동",
+                "cue": "가슴 중앙이 열리는 느낌. 목과 어깨에 긴장 없어야 함",
+                "sets": 3, "hold_sec": 30, "rest_sec": 15,
+                "freq_per_day": 2,
+                "progression": "팔 높이 변경으로 상·중·하부 섬유 분리 (아래→어깨높이→위)",
+                "contraindication": ["급성 어깨 충돌증후군", "회전근개 파열 급성기"]
+              },
+              {
+                "name": "Foam Roller Thoracic Extension",
+                "name_ko": "폼롤러 흉추 신전 스트레칭",
+                "type": "myofascial_release + static_stretch",
+                "position": "폼롤러를 등 중간(T4-T8)에 대고 양손 머리 뒤로, 천천히 뒤로 기대기",
+                "cue": "허리가 아닌 등 중간이 펴지는 느낌. 분절별로 위치 이동",
+                "sets": 3, "hold_sec": 20, "rest_sec": 10,
+                "freq_per_day": 1,
+                "contraindication": ["흉추 압박골절", "골다공증 중증"]
+              }
+            ],
+            "self_mfr": {
+              "name": "Lacrosse Ball Pec Minor Release",
+              "name_ko": "라크로스볼 소흉근 이완",
+              "position": "흉근 부착부(오훼돌기 내측)에 공을 대고 벽에 기댄 채 30-60초 압박",
+              "pressure": "3-4/10 통증 허용 범위",
+              "duration_sec": 45,
+              "freq_per_day": 1
+            }
+          }
+        },
+
+        {
+          "muscle_id": "UCS-T-02",
+          "muscle": "상부 승모근 + 견갑거근 (Upper Trapezius + Levator Scapulae)",
+          "role_in_dysfunction": "어깨 거상·경추 측굴 유발, 하부승모근 억제",
+          "interventions": {
+            "stretching": [
+              {
+                "name": "Upper Trap Lateral Flexion Stretch",
+                "name_ko": "상부승모근 측방굴곡 스트레칭",
+                "type": "static_stretch",
+                "position": "앉아서 한손 의자 잡기, 반대손으로 머리를 대각선 아래로 부드럽게 당기기",
+                "cue": "목 옆면·어깨 위가 당기는 느낌. 어깨가 올라오지 않도록",
+                "sets": 3, "hold_sec": 30, "rest_sec": 10,
+                "freq_per_day": 2,
+                "angle": "굴곡 45° + 대측 회전 15°",
+                "contraindication": ["급성 경추 디스크 탈출 (방사통 동반 시 금지)"]
+              },
+              {
+                "name": "Levator Scapulae Stretch",
+                "name_ko": "견갑거근 스트레칭",
+                "type": "static_stretch",
+                "position": "머리를 45° 회전 + 45° 굴곡 (대각선 아래), 반대손으로 가볍게 압박",
+                "cue": "목 뒤-옆-어깨 이음부가 당기는 느낌",
+                "sets": 3, "hold_sec": 30, "rest_sec": 10,
+                "freq_per_day": 2,
+                "contraindication": ["경추 관절 불안정성"]
+              }
+            ]
+          }
+        },
+
+        {
+          "muscle_id": "UCS-T-03",
+          "muscle": "흉쇄유돌근 + 후두하근 (SCM + Suboccipitals)",
+          "role_in_dysfunction": "두부전방이동 고착화, 두통·어지럼 유발 가능",
+          "interventions": {
+            "stretching": [
+              {
+                "name": "SCM Stretch",
+                "name_ko": "흉쇄유돌근 스트레칭",
+                "type": "static_stretch",
+                "position": "앉아서 한손 쇄골 고정, 머리를 반대방향 회전 + 약간 신전",
+                "cue": "목 앞옆면이 당기는 느낌. 어지러우면 즉시 중단",
+                "sets": 3, "hold_sec": 20, "rest_sec": 10,
+                "freq_per_day": 1,
+                "contraindication": ["경동맥 협착증 의심", "현기증 병력"]
+              },
+              {
+                "name": "Suboccipital Release",
+                "name_ko": "후두하근 이완 (손가락 압박법)",
+                "type": "myofascial_release",
+                "position": "바로 눕기, 양 엄지손가락을 후두골 아래(C1-C2 부착부)에 대고 두개골 무게만으로 압박",
+                "cue": "두통이 줄어드는 느낌. 강하게 누르지 않음",
+                "duration_sec": 60,
+                "freq_per_day": 1,
+                "contraindication": ["경추 상부 불안정성", "류마티스 관절염"]
+              }
+            ]
+          }
+        }
+      ],
+
+      "weak_muscles": [
+
+        {
+          "muscle_id": "UCS-W-01",
+          "muscle": "심부 경굴근 (Deep Cervical Flexors: Longus Colli + Longus Capitis)",
+          "role_in_dysfunction": "두부전방이동 조절 실패, 경추 분절 불안정",
+          "target_activation": "SCM 대신 심부 경굴근 선택적 활성화",
+          "interventions": {
+            "activation_exercise": [
+              {
+                "name": "Craniocervical Flexion Exercise (CCFE)",
+                "name_ko": "두개경추 굴곡 운동 (끄덕이기)",
+                "type": "motor_control",
+                "position": "바로 눕기, 소수건을 목 아래 받치기. 고개를 작게 끄덕이는 동작만",
+                "cue": "'예스'처럼 작게 끄덕이기. SCM이 굳어지면 강도 과다. 목 전체가 들리면 안 됨",
+                "sets": 3, "reps": 10, "hold_sec": 10, "rest_sec": 5,
+                "freq_per_day": 1, "freq_per_week": 5,
+                "progression": "22mmHg → 24 → 26 → 28 → 30mmHg (압력바이오피드백 5단계)",
+                "evidence": "Level A — Jull 2009 Spine",
+                "contraindication": ["급성 경추 디스크 탈출 C5-C7", "경추 불안정성"]
+              },
+              {
+                "name": "Chin Tuck Against Wall",
+                "name_ko": "벽 턱당기기",
+                "type": "strengthening",
+                "position": "등·뒤통수 벽에 붙이기, 턱을 뒤로 당겨 이중턱 만들기. 유지",
+                "cue": "뒷목이 길어지는 느낌. 턱이 위로 들리면 안 됨",
+                "sets": 3, "reps": 10, "hold_sec": 5, "rest_sec": 5,
+                "freq_per_day": 2,
+                "progression": "벽 → 중력 저항 (앉아서) → 서서 → 밴드 저항"
+              }
+            ]
+          }
+        },
+
+        {
+          "muscle_id": "UCS-W-02",
+          "muscle": "하부 승모근 (Lower Trapezius)",
+          "role_in_dysfunction": "견갑골 하강·후인 불가, 어깨 거상 보상 패턴",
+          "interventions": {
+            "activation_exercise": [
+              {
+                "name": "Prone Y Raise",
+                "name_ko": "엎드려 Y 들기",
+                "type": "strengthening",
+                "position": "엎드려 눕기, 팔을 Y자(약 135°)로 벌려 엄지 위로 들어올리기",
+                "cue": "어깨가 귀에서 멀어지는 느낌. 등 아래-중간에서 조여지는 느낌",
+                "sets": 3, "reps": 12, "hold_sec": 2, "rest_sec": 60,
+                "freq_per_week": 4,
+                "progression": "맨몸 → 1-2kg 덤벨 → 세라밴드",
+                "contraindication": ["급성 어깨 충돌증후군"]
+              },
+              {
+                "name": "Wall Slide",
+                "name_ko": "벽 슬라이드",
+                "type": "motor_control + strengthening",
+                "position": "등·팔뚝을 벽에 붙이고 팔꿈치 90°에서 천천히 머리 위로 슬라이드",
+                "cue": "어깨가 올라가면 중단. 벽에서 팔뚝이 떨어지지 않도록",
+                "sets": 3, "reps": 10, "rest_sec": 60,
+                "freq_per_week": 4
+              }
+            ]
+          }
+        },
+
+        {
+          "muscle_id": "UCS-W-03",
+          "muscle": "능형근 + 전거근 (Rhomboids + Serratus Anterior)",
+          "role_in_dysfunction": "견갑골 전인·익상 견갑 유발",
+          "interventions": {
+            "activation_exercise": [
+              {
+                "name": "Band Pull Apart",
+                "name_ko": "밴드 수평 당기기",
+                "type": "strengthening",
+                "position": "앞으로 팔 뻗어 세라밴드 잡기, 양팔을 수평으로 당겨 T자 만들기",
+                "cue": "등 가운데 근육이 조여지는 느낌. 어깨가 올라오지 않도록",
+                "sets": 3, "reps": 15, "rest_sec": 60,
+                "freq_per_week": 4,
+                "band_color_progression": "Yellow → Red → Green"
+              },
+              {
+                "name": "Serratus Wall Push",
+                "name_ko": "전거근 벽 밀기",
+                "type": "motor_control",
+                "position": "벽에 손 짚고 팔굽혀펴기 자세. 팔꿈치 고정한 채 등(견갑골)을 벽 쪽으로 밀어내기",
+                "cue": "날개뼈가 등에 붙는 느낌. 견갑골 내측이 들리면 안 됨",
+                "sets": 3, "reps": 10, "hold_sec": 3, "rest_sec": 30,
+                "freq_per_week": 3
+              }
+            ]
+          }
+        }
+      ]
+    },
+
+    {
+      "pattern_id": "LCS",
+      "pattern_name": "Lower Crossed Syndrome",
+      "pattern_name_ko": "하부 교차 증후군",
+      "description": "장요근·척추기립근 단축 + 복횡근·대둔근 약화로 인한 골반 전방경사 및 요추 과전만 패턴",
+      "measurement_triggers": {
+        "pelvic_tilt_deg": "> 15 (남성) / > 20 (여성)",
+        "lumbar_lordosis_deg": "> 50",
+        "hip_flexor_tightness": true
+      },
+
+      "tight_muscles": [
+
+        {
+          "muscle_id": "LCS-T-01",
+          "muscle": "장요근 (Iliopsoas: Iliacus + Psoas Major)",
+          "role_in_dysfunction": "골반 전방경사 고착, 요추 분절 압박 증가",
+          "interventions": {
+            "stretching": [
+              {
+                "name": "Half-Kneeling Hip Flexor Stretch (Thomas Position)",
+                "name_ko": "하프 닐링 장요근 스트레칭",
+                "type": "static_stretch",
+                "position": "한쪽 무릎 꿇기, 반대발 앞으로. 복부 수축 후 골반 후방경사 유지하며 앞으로 체중 이동",
+                "cue": "아랫배 당기기 먼저. 허리가 뒤로 젖히지 않도록. 고관절 전면 당김 느낌",
+                "sets": 3, "hold_sec": 45, "rest_sec": 15,
+                "freq_per_day": 2,
+                "nrs_target": "2-4/10",
+                "progression": "정적 → 뒤쪽 무릎 들기(불안정면) → 짐볼 위",
+                "contraindication": ["급성 무릎 통증", "고관절 관절염 급성기"]
+              },
+              {
+                "name": "Psoas Release on Foam Roller",
+                "name_ko": "폼롤러 장요근 이완",
+                "type": "myofascial_release",
+                "position": "엎드려서 폼롤러를 장골능 내측(장요근 주행로)에 대고 상체로 체중 조절",
+                "cue": "깊은 복부 내측 압박감. 날카로운 통증 시 즉시 중단",
+                "duration_sec": 45, "freq_per_day": 1,
+                "contraindication": ["복부 대동맥류 의심", "임산부"]
+              }
+            ]
+          }
+        },
+
+        {
+          "muscle_id": "LCS-T-02",
+          "muscle": "척추기립근 요부 + TFL (Lumbar Erector Spinae + Tensor Fasciae Latae)",
+          "role_in_dysfunction": "요추 과전만 유지, 장경인대 긴장 및 무릎 외측 통증 유발",
+          "interventions": {
+            "stretching": [
+              {
+                "name": "Child's Pose",
+                "name_ko": "차일드 포즈 (요부 기립근 스트레칭)",
+                "type": "static_stretch",
+                "position": "무릎 꿇고 앉아 양팔 앞으로 뻗어 이마를 바닥에 내려놓기",
+                "cue": "요추 전체가 풀리는 느낌. 엉덩이가 발뒤꿈치에서 떨어지지 않도록",
+                "sets": 3, "hold_sec": 40, "rest_sec": 15,
+                "freq_per_day": 2,
+                "contraindication": ["무릎 심한 굴곡 제한", "요추 전방전위증"]
+              },
+              {
+                "name": "Standing TFL/IT Band Stretch",
+                "name_ko": "선 자세 TFL 스트레칭",
+                "type": "static_stretch",
+                "position": "한 발을 반대 발 뒤로 교차, 같은 방향 손을 위로 들고 반대 방향으로 측굴",
+                "cue": "허벅지 외측에서 골반 외측까지 당기는 느낌",
+                "sets": 3, "hold_sec": 30, "rest_sec": 10,
+                "freq_per_day": 2
+              }
+            ]
+          }
+        },
+
+        {
+          "muscle_id": "LCS-T-03",
+          "muscle": "이상근 (Piriformis)",
+          "role_in_dysfunction": "좌골신경 압박, 엉덩이 통증, 보행 이상 유발",
+          "interventions": {
+            "stretching": [
+              {
+                "name": "Supine Piriformis Stretch (Figure-4)",
+                "name_ko": "누운 자세 이상근 스트레칭 (숫자 4 자세)",
+                "type": "static_stretch",
+                "position": "바로 눕기, 한쪽 발목을 반대 무릎 위에 올리기(숫자 4). 아래 다리를 가슴으로 당기기",
+                "cue": "엉덩이 깊숙이 당기는 느낌. 좌골신경통 악화 시 즉시 중단",
+                "sets": 3, "hold_sec": 40, "rest_sec": 15,
+                "freq_per_day": 2,
+                "contraindication": ["급성 좌골신경통", "고관절 후방 치환술 후 90일 이내"]
+              }
+            ]
+          }
+        }
+      ],
+
+      "weak_muscles": [
+
+        {
+          "muscle_id": "LCS-W-01",
+          "muscle": "복횡근 (Transversus Abdominis)",
+          "role_in_dysfunction": "요추 분절 안정화 실패, 골반 전방경사 조절 불가",
+          "interventions": {
+            "activation_exercise": [
+              {
+                "name": "Abdominal Hollowing (Drawing-In)",
+                "name_ko": "복횡근 활성화 (배꼽 당기기)",
+                "type": "motor_control",
+                "position": "바로 눕기 or 4발 자세. 배꼽을 척추 쪽으로 살짝 당기기. 호흡 유지 필수",
+                "cue": "배 전체가 꺼지는 게 아니라 배꼽 안쪽만 당기는 느낌. 숨 참으면 안 됨",
+                "intensity": "최대 수축의 30% (초음파상 TA 두께 20-40% 증가 목표)",
+                "sets": 3, "reps": 10, "hold_sec": 10, "rest_sec": 5,
+                "freq_per_day": 2,
+                "progression": "누운 자세 → 앉기 → 서기 → 보행 중 수행",
+                "evidence": "Level A — Richardson 2004"
+              },
+              {
+                "name": "Dead Bug",
+                "name_ko": "데드버그",
+                "type": "motor_control + strengthening",
+                "position": "바로 눕기, 팔다리 90°. 복횡근 수축 유지하며 반대팔-다리 동시에 천천히 내리기",
+                "cue": "요추가 바닥에서 뜨면 동작 범위 줄이기. 내리는 속도가 핵심",
+                "sets": 3, "reps": 8, "rest_sec": 60,
+                "freq_per_week": 4,
+                "progression": "한쪽 다리만 → 팔다리 교차 → 밴드 추가"
+              }
+            ]
+          }
+        },
+
+        {
+          "muscle_id": "LCS-W-02",
+          "muscle": "대둔근 (Gluteus Maximus)",
+          "role_in_dysfunction": "햄스트링 보상 패턴, 골반 전방경사 조절 실패",
+          "interventions": {
+            "activation_exercise": [
+              {
+                "name": "Glute Bridge",
+                "name_ko": "글루트 브릿지",
+                "type": "strengthening",
+                "position": "바로 눕기, 무릎 90°. 발뒤꿈치로 밀어내며 엉덩이 들기. 어깨-골반-무릎 일직선",
+                "cue": "햄스트링 경련 시 발을 몸 가까이. 엉덩이 조이는 느낌이 주",
+                "sets": 3, "reps": 15, "hold_sec": 2, "rest_sec": 60,
+                "freq_per_week": 5,
+                "progression": "양발 → 한 발 (Single Leg Bridge) → 어깨 짐볼 → 바벨",
+                "evidence": "Level A — Buckthorpe 2019 JOSPT"
+              },
+              {
+                "name": "Clamshell",
+                "name_ko": "클램쉘 (중둔근 포함 활성화)",
+                "type": "strengthening",
+                "position": "옆으로 눕기, 무릎 45° 굴곡. 발이 붙은 채로 위쪽 무릎을 조개처럼 열기",
+                "cue": "골반이 뒤로 굴러가지 않도록. 엉덩이 측면에서 조이는 느낌",
+                "sets": 3, "reps": 15, "hold_sec": 2, "rest_sec": 45,
+                "freq_per_week": 4,
+                "progression": "맨몸 → 세라밴드 (무릎 위)"
+              }
+            ]
+          }
+        },
+
+        {
+          "muscle_id": "LCS-W-03",
+          "muscle": "다열근 (Multifidus)",
+          "role_in_dysfunction": "요추 분절 간 안정화 실패, 만성 요통 유발",
+          "interventions": {
+            "activation_exercise": [
+              {
+                "name": "Bird-Dog",
+                "name_ko": "버드독",
+                "type": "motor_control + strengthening",
+                "position": "4발 자세. 복횡근 수축 후 반대팔-다리 동시에 천천히 뻗기. 척추 중립 유지",
+                "cue": "허리가 흔들리거나 회전하면 범위 줄이기. 뻗는 것보다 '버티는 것'이 목표",
+                "sets": 3, "reps": 10, "hold_sec": 5, "rest_sec": 30,
+                "freq_per_week": 5,
+                "progression": "팔만 → 다리만 → 교차 → 밴드 저항",
+                "evidence": "Level A — McGill 2010"
+              }
+            ]
+          }
+        }
+      ]
+    },
+
+    {
+      "pattern_id": "FLAT",
+      "pattern_name": "Flat Back Syndrome",
+      "pattern_name_ko": "편평등 증후군",
+      "description": "햄스트링·복직근 단축 + 장요근·요추 신전근 약화로 인한 요추 전만 소실 및 골반 후방경사 패턴",
+      "measurement_triggers": {
+        "lumbar_lordosis_deg": "< 20",
+        "pelvic_tilt": "posterior",
+        "hip_extension_limited": true
+      },
+      "clinical_note": "LCS와 반대 방향. 장요근이 여기서는 '약화근'임 — 처방 방향 혼동 주의",
+
+      "tight_muscles": [
+
+        {
+          "muscle_id": "FLAT-T-01",
+          "muscle": "햄스트링 (Hamstrings: Biceps Femoris + Semimembranosus + Semitendinosus)",
+          "role_in_dysfunction": "골반 후방경사 고착, 요추 전만 소실 유지",
+          "interventions": {
+            "stretching": [
+              {
+                "name": "Supine Hamstring Stretch (Strap)",
+                "name_ko": "바로 누운 햄스트링 스트레칭",
+                "type": "static_stretch",
+                "position": "바로 눕기, 한쪽 다리를 스트랩으로 들어올리기. 무릎 약간 굽혀도 가능",
+                "cue": "대퇴 후면 당김이 목표. 무릎 완전 신전 강박 없이",
+                "sets": 3, "hold_sec": 30, "rest_sec": 15,
+                "freq_per_day": 2,
+                "contraindication": ["좌골신경통 급성기", "PCL 손상"]
+              },
+              {
+                "name": "Doorway Hamstring Stretch",
+                "name_ko": "문틈 햄스트링 스트레칭",
+                "type": "static_stretch",
+                "position": "문틈 바닥에 눕기. 한 다리는 문틀에 올리고 반대 다리는 문 밖으로 편평하게",
+                "cue": "올린 다리 뒤면이 늘어나는 느낌. 골반이 바닥에 평평하게 붙도록",
+                "sets": 3, "hold_sec": 40, "rest_sec": 15,
+                "freq_per_day": 2
+              }
+            ]
+          }
+        },
+
+        {
+          "muscle_id": "FLAT-T-02",
+          "muscle": "복직근 (Rectus Abdominis)",
+          "role_in_dysfunction": "과활성으로 골반 후방경사 유지, 흉추 굴곡 증가",
+          "interventions": {
+            "stretching": [
+              {
+                "name": "Prone Press-Up (McKenzie Extension)",
+                "name_ko": "엎드려 팔굽혀펴기 신전 (맥켄지 신전)",
+                "type": "static_stretch + mobility",
+                "position": "엎드려 눕기, 양손 어깨 옆. 팔로 상체만 들어올리기. 골반·하지는 바닥에 고정",
+                "cue": "허리에 힘 빼고 팔로만 들기. 엉덩이에 힘 들어가면 효과 감소",
+                "sets": 3, "hold_sec": 15, "rest_sec": 15,
+                "freq_per_day": 2,
+                "progression": "1단계(엎드리기) → 2단계(팔꿈치 지지) → 3단계(손 지지) → 서서 허리 뒤로",
+                "contraindication": ["요추 협착증 (신전 시 통증 악화)", "척추분리증"]
+              }
+            ]
+          }
+        }
+      ],
+
+      "weak_muscles": [
+
+        {
+          "muscle_id": "FLAT-W-01",
+          "muscle": "장요근 — 약화 (Iliopsoas: Weak in Flat Back)",
+          "role_in_dysfunction": "요추 전만 생성력 부족, 고관절 굴곡력 저하",
+          "clinical_note": "LCS에서는 단축근이지만 Flat Back에서는 약화근 — 처방 완전 반대",
+          "interventions": {
+            "activation_exercise": [
+              {
+                "name": "Prone Hip Extension (Knee Flexed)",
+                "name_ko": "엎드려 고관절 신전 (무릎 굽힌 채)",
+                "type": "strengthening",
+                "position": "엎드려 눕기. 무릎 90° 굽히고 발을 들어올려 고관절 신전",
+                "cue": "배를 살짝 들어 요추 과신전 방지. 엉덩이 뒤쪽이 조여지는 느낌",
+                "sets": 3, "reps": 12, "hold_sec": 2, "rest_sec": 60,
+                "freq_per_week": 4,
+                "contraindication": ["요추 후방 분절 병변", "임산부"]
+              },
+              {
+                "name": "Hanging Knee Raise",
+                "name_ko": "철봉 무릎 들기",
+                "type": "strengthening",
+                "position": "철봉에 매달려 무릎을 90° 이상 들어올리기. 허리 스윙 최소화",
+                "cue": "고관절 굴곡이 주 동작. 복부 과수축으로 요추 굴곡되면 장요근 자극 감소",
+                "sets": 3, "reps": 10, "rest_sec": 90,
+                "freq_per_week": 3,
+                "progression": "무릎 굽힘 → 무릎 신전 → 발목 웨이트"
+              }
+            ]
+          }
+        },
+
+        {
+          "muscle_id": "FLAT-W-02",
+          "muscle": "요추 신전근 + 흉추 신전근 (Lumbar/Thoracic Extensors)",
+          "role_in_dysfunction": "요추 전만 유지 불가, 직립 자세 유지력 저하",
+          "interventions": {
+            "activation_exercise": [
+              {
+                "name": "Superman / Back Extension",
+                "name_ko": "슈퍼맨 운동",
+                "type": "strengthening",
+                "position": "엎드려 눕기. 팔다리를 동시에 들어올려 5초 유지",
+                "cue": "목이 과신전되지 않도록. 흉추-요추 전체가 들리는 느낌",
+                "sets": 3, "reps": 10, "hold_sec": 5, "rest_sec": 60,
+                "freq_per_week": 4,
+                "progression": "양팔양다리 → 교차 → 벤치 백익스텐션"
+              },
+              {
+                "name": "Seated Good Morning",
+                "name_ko": "앉아서 굿모닝",
+                "type": "strengthening",
+                "position": "의자 끝에 앉기. 척추 중립 유지하며 상체를 앞으로 45° 숙이기 후 세우기",
+                "cue": "허리가 둥글게 말리면 안 됨. 등 전체가 뻗어있는 채로 이동",
+                "sets": 3, "reps": 15, "rest_sec": 60,
+                "freq_per_week": 4
+              }
+            ]
+          }
+        }
+      ]
+    },
+
+    {
+      "pattern_id": "SWAY",
+      "pattern_name": "Sway Back Posture",
+      "pattern_name_ko": "스웨이백 자세",
+      "description": "햄스트링·내복사근 단축 + 장요근·다열근 약화로 인한 골반 전방이동(전방경사와 다름) 및 흉추 장분절 후만 패턴",
+      "measurement_triggers": {
+        "pelvis_anterior_shift": true,
+        "thoracic_kyphosis_long_segment": true,
+        "cervical_hyperextension": true
+      },
+      "clinical_note": "Flat Back과 시각적으로 유사하나 골반 위치가 다름 — 전방 이동(shift) vs 후방 경사(tilt). 치료 방향 다름",
+
+      "tight_muscles": [
+
+        {
+          "muscle_id": "SWAY-T-01",
+          "muscle": "햄스트링 (Hamstrings) — Sway Back에서도 단축",
+          "role_in_dysfunction": "골반 전방이동 고착, 고관절 신전 제한",
+          "interventions": {
+            "stretching": [
+              {
+                "name": "Standing Hamstring Stretch (Neural Bias)",
+                "name_ko": "선 자세 햄스트링 스트레칭 (신경 편향)",
+                "type": "static_stretch",
+                "position": "한 발 앞으로 내밀고 발끝 들기. 상체를 곧게 세운 채 앞으로 기울기",
+                "cue": "무릎 뒤가 아닌 대퇴 뒤면 전체 당김 목표. 좌골신경통 증상 시 발끝 들기 제거",
+                "sets": 3, "hold_sec": 30, "rest_sec": 15,
+                "freq_per_day": 2
+              }
+            ]
+          }
+        },
+
+        {
+          "muscle_id": "SWAY-T-02",
+          "muscle": "내복사근 + 상부 흉추 신전근 (Internal Oblique + Upper Thoracic Extensors)",
+          "role_in_dysfunction": "흉추 장분절 후만 고착, 흉곽 압박",
+          "interventions": {
+            "stretching": [
+              {
+                "name": "Thoracic Rotation Stretch",
+                "name_ko": "흉추 회전 스트레칭",
+                "type": "mobility",
+                "position": "옆으로 눕기, 무릎 90°. 위쪽 팔을 뒤로 회전시키며 흉추 회전",
+                "cue": "허리가 돌아가면 안 됨. 가슴이 열리는 느낌에 집중",
+                "sets": 3, "reps": 10, "hold_sec": 3, "rest_sec": 30,
+                "freq_per_day": 2
+              },
+              {
+                "name": "Open Book Stretch",
+                "name_ko": "책 펼치기 스트레칭",
+                "type": "mobility",
+                "position": "옆으로 눕기, 양 무릎 겹치기. 위쪽 손을 반대쪽 바닥으로 회전 후 원위치",
+                "cue": "무릎이 바닥에서 뜨지 않도록. 눈은 움직이는 손을 따라가기",
+                "sets": 3, "reps": 10, "hold_sec": 2, "rest_sec": 30,
+                "freq_per_day": 1
+              }
+            ]
+          }
+        }
+      ],
+
+      "weak_muscles": [
+
+        {
+          "muscle_id": "SWAY-W-01",
+          "muscle": "장요근 — 약화 (Iliopsoas: Weak in Sway Back)",
+          "role_in_dysfunction": "골반 전방이동 교정력 부족",
+          "clinical_note": "LCS에서 단축근이지만 Sway Back에서는 약화근",
+          "interventions": {
+            "activation_exercise": [
+              {
+                "name": "Standing Hip Flexion Hold",
+                "name_ko": "서서 고관절 굴곡 유지",
+                "type": "strengthening",
+                "position": "서서 한 무릎을 90° 이상 들어올려 버티기. 골반이 기울지 않도록",
+                "cue": "골반 중립 유지. 보상으로 허리가 굴곡되지 않도록",
+                "sets": 3, "reps": 10, "hold_sec": 5, "rest_sec": 30,
+                "freq_per_week": 4,
+                "progression": "벽 짚고 → 맨손 → 발목 웨이트"
+              }
+            ]
+          }
+        },
+
+        {
+          "muscle_id": "SWAY-W-02",
+          "muscle": "다열근 + 외복사근 (Multifidus + External Oblique)",
+          "role_in_dysfunction": "요추 전만 생성 및 골반 전방이동 교정 실패",
+          "interventions": {
+            "activation_exercise": [
+              {
+                "name": "Side Plank",
+                "name_ko": "사이드 플랭크",
+                "type": "strengthening",
+                "position": "옆으로 누워 팔꿈치 지지. 골반 들어올려 머리-발 일직선",
+                "cue": "골반이 앞으로 빠지거나 처지지 않도록. 호흡 유지",
+                "sets": 3, "hold_sec": 20, "rest_sec": 45,
+                "freq_per_week": 4,
+                "progression": "무릎 굽힘 → 무릎 신전 → 발 들기 → TRX"
+              },
+              {
+                "name": "Pallof Press",
+                "name_ko": "팔로프 프레스",
+                "type": "anti-rotation strengthening",
+                "position": "케이블/밴드를 옆에서 잡고 정면으로 밀어내기. 척추 회전 최소화",
+                "cue": "회전에 저항하는 것이 목적. 몸통이 당겨지지 않도록",
+                "sets": 3, "reps": 10, "hold_sec": 2, "rest_sec": 60,
+                "freq_per_week": 3
+              }
+            ]
+          }
+        },
+
+        {
+          "muscle_id": "SWAY-W-03",
+          "muscle": "대둔근 (Gluteus Maximus) — Sway Back에서도 약화",
+          "role_in_dysfunction": "고관절 신전력 부족, 골반 전방이동 보상",
+          "interventions": {
+            "activation_exercise": [
+              {
+                "name": "Hip Thrust",
+                "name_ko": "힙 쓰러스트",
+                "type": "strengthening",
+                "position": "어깨를 벤치에 기대고 발은 앞. 골반을 들어올려 어깨-골반-무릎 일직선",
+                "cue": "글루트 브릿지보다 더 큰 고관절 신전 범위. 요추 과신전 주의",
+                "sets": 3, "reps": 12, "hold_sec": 2, "rest_sec": 60,
+                "freq_per_week": 3,
+                "progression": "맨몸 → 바벨 → 밴드 추가"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+
+  "service_integration": {
+    "retrieval_logic": {
+      "step1": "측정값 → 패턴 감지 (measurement_triggers 비교)",
+      "step2": "해당 패턴의 tight_muscles + weak_muscles 청크 retrieval",
+      "step3": "muscle_type(tight→스트레칭 우선 / weak→활성화 우선) 필터",
+      "step4": "contraindication 체크 (사용자 입력 병력 기반)",
+      "step5": "운동 처방 생성 (세트/횟수/cue 포함)"
+    },
+    "priority_order": "inhibition(단축근 이완) → activation(약화근 활성화) → integration(복합 운동)",
+    "session_structure": {
+      "warm_up_min": 5,
+      "inhibition_min": 10,
+      "activation_min": 15,
+      "integration_min": 10,
+      "cool_down_min": 5
+    },
+    "conflict_check": {
+      "note": "동일 근육이 패턴마다 다른 역할(UCS에서 단축 vs Flat Back에서 약화)을 할 수 있음",
+      "example": "장요근: LCS=단축 / FlatBack=약화 / SwayBack=약화",
+      "resolution": "복합 패턴 감지 시 우세 패턴 기준 처방 or 물리치료사 상담 안내"
+    }
+  }
+}

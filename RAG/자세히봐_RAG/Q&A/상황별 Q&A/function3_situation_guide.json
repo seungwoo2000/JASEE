@@ -1,0 +1,102 @@
+{
+  "situation_guides": [
+    {
+      "situation": "모니터가 너무 낮음",
+      "detected_by": "모니터 시선각 Bad / CVA Bad",
+      "quick_fix": "모니터 받침대 설치 (5~10cm 높이)",
+      "vdt_ref": "제6조 1항",
+      "expected_improvement": "CVA Zone 2→1, 모니터 시선각 Good"
+    },
+    {
+      "situation": "모니터가 너무 높음",
+      "detected_by": "모니터 시선각 Bad (상방 시선)",
+      "quick_fix": "받침대 제거 또는 의자 높이 올리기",
+      "vdt_ref": "제6조 1항",
+      "expected_improvement": "모니터 시선각 Good, CVA 개선"
+    },
+    {
+      "situation": "허리가 등받이에서 떨어져 있음",
+      "detected_by": "의자-등받이 거리 Bad / TIA Bad",
+      "quick_fix": "의자 깊숙이 앉기 + 요추 쿠션 설치",
+      "vdt_ref": "제5조 4항 3호, 제6조 4항",
+      "expected_improvement": "TIA Zone 2→1, 의자-등받이 Good"
+    },
+    {
+      "situation": "팔꿈치가 책상보다 높음",
+      "detected_by": "작업대 높이 Bad / 팔꿈치각도 Bad",
+      "quick_fix": "의자 높이 올리기 또는 책상 낮추기",
+      "vdt_ref": "제5조 3항, 제6조 2항",
+      "expected_improvement": "팔꿈치각도 Good, 작업대 높이 Good"
+    },
+    {
+      "situation": "팔꿈치가 책상보다 낮음",
+      "detected_by": "작업대 높이 Bad",
+      "quick_fix": "의자 낮추기 (발 받침대 함께 사용)",
+      "vdt_ref": "제5조 3항",
+      "expected_improvement": "작업대 높이 Good, 무릎각도 확인 필요"
+    },
+    {
+      "situation": "손목이 꺾여 있음",
+      "detected_by": "손목각도 Bad",
+      "quick_fix": "손목 받침대 설치 + 키보드 15cm 안쪽 배치",
+      "vdt_ref": "제5조 2항 7호",
+      "expected_improvement": "손목각도 ±15° 이내 Good"
+    },
+    {
+      "situation": "발이 바닥에 닿지 않음",
+      "detected_by": "무릎각도 Bad",
+      "quick_fix": "발 받침대 설치",
+      "vdt_ref": "제6조 5항",
+      "expected_improvement": "무릎각도 85~100° Good"
+    },
+    {
+      "situation": "몸이 책상으로 기울어짐",
+      "detected_by": "체간-책상거리 Bad / TIA Bad",
+      "quick_fix": "의자 뒤로 당기기 + 모니터 앞으로 이동",
+      "vdt_ref": "제5조 3항",
+      "expected_improvement": "체간-책상거리 Good, TIA 개선"
+    }
+  ],
+
+  "environment_standards_summary": {
+    "monitor": {
+      "height": "상단이 눈높이와 일치 또는 약간 아래",
+      "angle": "수평 하방 10~15°",
+      "distance": "40cm 이상",
+      "vdt_ref": "제6조 1항"
+    },
+    "keyboard": {
+      "position": "책상 앞면에서 15cm 이상 안쪽",
+      "tilt": "5~15°",
+      "wrist_support": "손목 받침대 사용 권장",
+      "vdt_ref": "제5조 2항"
+    },
+    "desk": {
+      "height_fixed": "60~70cm",
+      "height_adjustable": "65cm 전후",
+      "width": "120cm 이상",
+      "depth": "70cm 이상",
+      "vdt_ref": "제5조 3항"
+    },
+    "chair": {
+      "seat_height": "35~45cm",
+      "seat_depth": "38~42cm",
+      "seat_width": "40~45cm",
+      "backrest": "요추~어깨 지지, 높이·각도 조절 가능",
+      "vdt_ref": "제5조 4항"
+    },
+    "environment": {
+      "lighting_dark_bg": "300~500 Lux",
+      "lighting_white_bg": "500~700 Lux",
+      "temperature": "18~24°C",
+      "humidity": "40~70%",
+      "noise": "65dB(A) 이하",
+      "vdt_ref": "제7조, 제10조"
+    },
+    "work_time": {
+      "continuous_limit": "1시간 이하",
+      "rest_per_hour": "5~10분",
+      "vdt_ref": "제4조"
+    }
+  }
+}

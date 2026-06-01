@@ -1,0 +1,202 @@
+[
+  {
+    "id": "F2_SCORE_001",
+    "question": "제 RULA 점수가 1~2점 나왔어요. 어떤 의미인가요?",
+    "context_trigger": "RULA 최종 점수 1~2점",
+    "answer": "✓ RULA 점수 1~2점 — 위험 낮음 (조치 불필요)\n\n현재 자세는 근골격계 질환 위험이 매우 낮은 안전한 상태입니다. 상체(팔·손목)와 목·몸통 모두 인체공학적으로 적합한 자세를 유지하고 있습니다.\n\n이 상태를 유지하려면:\n• 1시간 작업 후 5~10분 스트레칭을 병행하세요 (VDT 고시 제4조)\n• 현재 모니터·의자·책상 위치를 그대로 유지하세요\n• 정기적으로 자세를 재분석하여 변화를 추적하세요",
+    "metadata": {
+      "rula_score_range": "1~2",
+      "risk_level": "낮음",
+      "action_required": false,
+      "body_part": "전체",
+      "source": "RULA Step-by-Step Guide / fit_me_up_자세기준서"
+    }
+  },
+  {
+    "id": "F2_SCORE_002",
+    "question": "RULA 점수 3~4점이 나왔어요. 괜찮은 건가요?",
+    "context_trigger": "RULA 최종 점수 3~4점",
+    "answer": "⚠ RULA 점수 3~4점 — 낮은 위험 (변경 고려)\n\n현재 자세에 경미한 위험 요인이 있습니다. 즉각적인 위험은 아니지만 장시간 지속되면 근골격계 부담이 누적될 수 있습니다.\n\n권고 조치:\n① 어떤 지표가 점수를 높이는지 부위별 분석 결과를 확인하세요\n② 가장 점수가 높은 부위(목·손목·허리 중)부터 우선 교정하세요\n③ 작업 자세 변경 또는 작업환경 조정을 검토하세요\n④ 1시간 이상 같은 자세를 유지하지 않도록 하세요",
+    "metadata": {
+      "rula_score_range": "3~4",
+      "risk_level": "낮은 위험",
+      "action_required": true,
+      "body_part": "전체",
+      "source": "RULA Step-by-Step Guide / fit_me_up_자세기준서"
+    }
+  },
+  {
+    "id": "F2_SCORE_003",
+    "question": "RULA 점수가 5~6점 나왔어요. 심각한 건가요?",
+    "context_trigger": "RULA 최종 점수 5~6점",
+    "answer": "⚠⚠ RULA 점수 5~6점 — 중간 위험 (빠른 변경 필요)\n\n현재 자세는 근골격계 질환 발생 위험이 있는 상태입니다. 빠른 시일 내에 작업자세와 환경을 개선해야 합니다.\n\n즉시 확인해야 할 항목:\n① 목굴곡각(CVA): 20° 초과 시 모니터 높이 조정 필요\n② 몸통굴곡각(TIA): 20° 초과 시 등받이에 기대도록 교정\n③ 손목: ±15° 초과 시 손목 받침대 사용\n④ 팔꿈치: 90° 미만 시 의자 높이 또는 책상 높이 조정\n\n부위별 분석 결과를 확인하고 점수가 높은 항목부터 순서대로 교정하세요.",
+    "metadata": {
+      "rula_score_range": "5~6",
+      "risk_level": "중간 위험",
+      "action_required": true,
+      "body_part": "전체",
+      "source": "RULA Step-by-Step Guide / fit_me_up_자세기준서"
+    }
+  },
+  {
+    "id": "F2_SCORE_004",
+    "question": "RULA 점수 7점 이상이 나왔어요. 어떻게 해야 하나요?",
+    "context_trigger": "RULA 최종 점수 7점 이상",
+    "answer": "🔴 RULA 점수 7점 이상 — 매우 높은 위험 (즉시 변경 필요)\n\n현재 자세는 근골격계 질환 발생 위험이 매우 높은 상태입니다. 지금 즉시 자세와 작업환경을 교정해야 합니다.\n\n즉시 해야 할 것:\n① 지금 당장 의자 깊숙이 앉아 등받이에 기대세요\n② 모니터를 눈높이에 맞게 조정하세요 (수평 하방 10~15°)\n③ 팔꿈치가 책상면과 수평이 되도록 의자 높이를 조정하세요\n④ 손목 받침대를 즉시 설치하세요\n\n⚠ 이 상태가 지속되면 경추·요추·손목 관련 근골격계 질환으로 이어질 수 있습니다. 부위별 교정 피드백을 반드시 확인하고 순서대로 개선하세요.",
+    "metadata": {
+      "rula_score_range": "7+",
+      "risk_level": "매우 높음",
+      "action_required": true,
+      "body_part": "전체",
+      "source": "RULA Step-by-Step Guide / fit_me_up_자세기준서"
+    }
+  },
+  {
+    "id": "F2_NECK_SCORE_001",
+    "question": "목(경추) 점수가 높게 나왔어요. 무슨 문제인가요?",
+    "context_trigger": "RULA Neck Zone 2~3 / CVA Bad",
+    "answer": "⚠ 경추(목) 점수가 기준을 초과했습니다 (RULA Neck Zone 2~3)\n\n목굴곡각(CVA)이 20°를 초과하여 전방두부자세(FHP)가 감지되었습니다. 이 상태에서는 경추에 가해지는 하중이 정상 대비 2~3배 증가합니다.\n\n원인과 교정 방법:\n• 원인: 모니터가 너무 낮거나 멀리 있어 고개를 앞으로 내밀게 됨\n• 교정 ①: 모니터 상단을 눈높이와 일치하도록 높이세요 (VDT 고시 제6조 1항)\n• 교정 ②: 화면과 눈 거리를 40cm 이상 확보하세요\n• 교정 ③: 1시간마다 목을 좌우로 5회 부드럽게 돌리세요\n\n방치 시 위험: 경추 디스크 압박, 두통, 어깨 방사통 유발 가능",
+    "metadata": {
+      "rula_component": "Neck",
+      "rula_zone": "Zone 2~3",
+      "body_part": "경추",
+      "indicator": "CVA",
+      "vdt_ref": "제6조 1항",
+      "source": "RULA Step-by-Step Guide / fit_me_up_자세기준서"
+    }
+  },
+  {
+    "id": "F2_TRUNK_SCORE_001",
+    "question": "몸통(요추) 점수가 높은데 어떤 문제인가요?",
+    "context_trigger": "RULA Trunk Zone 2~3 / TIA Bad",
+    "answer": "⚠ 요추(허리) 점수가 기준을 초과했습니다 (RULA Trunk Zone 2~3)\n\n몸통굴곡각(TIA)이 20°를 초과하여 과도한 전굴 자세가 감지되었습니다. 요추 추간판에 지속적인 압박이 가해지는 상태입니다.\n\n원인과 교정 방법:\n• 원인 ①: 의자 등받이를 사용하지 않고 앞쪽으로 앉음\n• 원인 ②: 모니터가 너무 멀거나 낮아 몸을 앞으로 숙임\n• 교정 ①: 의자 깊숙이 앉아 등받이에 허리를 완전히 기대세요 (VDT 고시 제6조 4항)\n• 교정 ②: 요추 쿠션을 등받이와 허리 사이에 놓으세요\n• 교정 ③: 모니터를 몸 가까이 당기거나 높이를 조정하세요\n\n방치 시 위험: 요추 디스크 탈출증, 만성 요통 유발 가능",
+    "metadata": {
+      "rula_component": "Trunk",
+      "rula_zone": "Zone 2~3",
+      "body_part": "요추",
+      "indicator": "TIA",
+      "vdt_ref": "제6조 4항",
+      "source": "RULA Step-by-Step Guide / fit_me_up_자세기준서"
+    }
+  },
+  {
+    "id": "F2_WRIST_SCORE_001",
+    "question": "손목 점수가 높게 나왔어요. 왜 그런 건가요?",
+    "context_trigger": "RULA Wrist Zone 1~2 / 손목 Bad",
+    "answer": "⚠ 손목 점수가 기준을 초과했습니다 (RULA Wrist Zone 1~2)\n\n손목 굴곡 또는 신전 각도가 ±15°를 초과하거나 손목이 비틀린 상태가 감지되었습니다. 반복 작업 시 손목건초염(CTS) 발생 위험이 증가합니다.\n\n원인과 교정 방법:\n• 원인 ①: 키보드가 너무 높거나 낮아 손목이 꺾임\n• 원인 ②: 손목 받침대 없이 장시간 키보드·마우스 사용\n• 교정 ①: 손목 받침대(Wrist Pad)를 키보드 앞에 설치하세요 (VDT 고시 제5조 2항 7호)\n• 교정 ②: 키보드와 책상 앞면 사이 15cm 이상 공간을 확보하세요\n• 교정 ③: 팔꿈치 내각 90° 이상 유지로 손목 중립 자세를 잡으세요\n\n방치 시 위험: 손목건초염(CTS), 건초염, 손가락 저림 유발 가능\n*손목건초염: 손목 힘줄을 감싸는 막에 염증이 생겨 손이나 엄지손가락을 움직일 때마다 통증이 발생하는 질환",
+    "metadata": {
+      "rula_component": "Wrist",
+      "rula_zone": "Zone 1~2",
+      "body_part": "손목",
+      "indicator": "손목각도",
+      "vdt_ref": "제5조 2항 7호",
+      "source": "RULA Step-by-Step Guide / fit_me_up_자세기준서"
+    }
+  },
+  {
+    "id": "F2_UPPER_ARM_SCORE_001",
+    "question": "팔꿈치 점수가 높은 이유가 뭔가요?",
+    "context_trigger": "RULA Upper Arm Zone 2~3 / 팔꿈치 Bad",
+    "answer": "⚠ 팔꿈치(윗팔) 점수가 기준을 초과했습니다 (RULA Upper Arm Zone 2~3)\n\n팔꿈치 내각이 90° 미만이거나 120°를 초과하여 윗팔이 과도하게 올라가거나 내려간 상태입니다.\n\n원인과 교정 방법:\n• 원인 ①: 책상이 너무 높아 어깨가 으쓱 올라감 (Zone 3)\n• 원인 ②: 책상이 너무 낮아 팔이 과하게 내려감 (Zone 2)\n• 교정 ①: 팔꿈치가 책상면과 수평이 되도록 의자 높이를 조정하세요\n• 교정 ②: 책상 높이 기준 60~70cm (고정형) 또는 65cm 전후 (조절형) 확인\n• 교정 ③: 어깨가 자연스럽게 내려뜨려진 상태에서 팔꿈치 내각 90° 이상 유지 (VDT 고시 제6조 2항)\n\n방치 시 위험: 어깨 충돌 증후군, 팔꿈치 관절염 위험 증가",
+    "metadata": {
+      "rula_component": "Upper Arm",
+      "rula_zone": "Zone 2~3",
+      "body_part": "어깨/팔꿈치",
+      "indicator": "팔꿈치각도",
+      "vdt_ref": "제6조 2항",
+      "source": "RULA Step-by-Step Guide / fit_me_up_자세기준서"
+    }
+  },
+  {
+    "id": "F2_SCORE_CHANGE_001",
+    "question": "지난번보다 RULA 점수가 올라갔어요. 왜 그런 건가요?",
+    "context_trigger": "RULA 점수 이전 대비 상승",
+    "answer": "⚠ RULA 점수가 이전 분석보다 상승했습니다\n\n자세 위험도가 높아진 상태입니다. 주로 아래 원인 중 하나입니다.\n\n점수 상승의 주요 원인:\n① 의자·모니터·키보드 위치가 바뀌었거나\n② 작업 시간이 길어져 피로 누적으로 자세가 무너졌거나\n③ 새로운 작업(자료 입력, 화상회의 등)으로 자세 패턴이 변경됨\n\n확인 방법:\n• 부위별 점수를 이전과 비교하여 어느 지표가 올랐는지 확인하세요\n• 점수가 올라간 지표의 교정 피드백을 우선 확인하세요\n• 작업 환경이 변경되었다면 환경 재설정 후 재분석하세요",
+    "metadata": {
+      "rula_component": "종합",
+      "rula_zone": "전체",
+      "body_part": "전체",
+      "trigger": "점수 상승",
+      "source": "RULA Step-by-Step Guide / fit_me_up_자세기준서"
+    }
+  },
+  {
+    "id": "F2_MUSCLE_SCORE_001",
+    "question": "근육 사용 점수가 추가됐는데 이게 뭔가요?",
+    "context_trigger": "RULA 근육 사용 가산점 (+1) 발생",
+    "answer": "근육 사용 가산점(+1)이란?\n\nRULA 평가에서 자세를 10분 이상 정적으로 유지하거나, 같은 동작을 1분에 4회 이상 반복할 때 +1점이 가산됩니다.\n\n이 점수가 추가된 이유:\n• 장시간 같은 자세로 고정된 작업을 하고 있거나\n• 타이핑·마우스 클릭 등 반복 동작이 많은 상태입니다\n\n개선 방법:\n① 매 1시간마다 5분 이상 자리에서 일어나 걸어보세요\n② 작업 중 스트레칭을 주기적으로 하세요\n③ 가능하면 업무 중간에 다른 종류의 작업을 섞어서 자세 변화를 주세요 (VDT 고시 제4조 1항)",
+    "metadata": {
+      "rula_component": "Muscle Use Score",
+      "rula_zone": "+1 가산",
+      "body_part": "전체",
+      "trigger": "정적 자세 10분 이상 또는 반복 4회/분",
+      "vdt_ref": "제4조 1항",
+      "source": "RULA Step-by-Step Guide"
+    }
+  },
+  {
+    "id": "F2_GROUP_A_001",
+    "question": "그룹 A 점수(팔·손목)와 그룹 B 점수(목·몸통)가 뭔가요?",
+    "context_trigger": "RULA 구조 질문",
+    "answer": "RULA는 크게 두 그룹으로 나뉘어 평가됩니다.\n\n그룹 A — 팔·손목 분석 (Steps 1~8)\n• 평가 항목: 윗팔 위치 → 아래팔 위치 → 손목 굴곡 → 손목 비틀림\n• 자세히봐 서비스 연결 지표: 팔꿈치 각도, 손목 각도, 작업대 높이\n• 위험 시: 팔꿈치·손목·어깨 관련 근골격계 질환 위험 증가\n\n그룹 B — 목·몸통·다리 분석 (Steps 9~15)\n• 평가 항목: 목 위치 → 몸통 위치 → 다리 지지 상태\n• 자세히봐 서비스 연결 지표: CVA(목굴곡각), TIA(몸통굴곡각), 무릎 각도, 의자-등받이 거리\n• 위험 시: 경추·요추 디스크, 허리 통증 위험 증가\n\n두 그룹의 점수를 Table C에서 교차하여 최종 RULA 점수(1~7+)를 산출합니다.",
+    "metadata": {
+      "rula_component": "구조 설명",
+      "rula_zone": "전체",
+      "body_part": "전체",
+      "trigger": "RULA 구조 질문",
+      "source": "RULA Step-by-Step Guide"
+    }
+  },
+  {
+    "id": "F2_SCORE_IMPROVE_001",
+    "question": "RULA 점수를 낮추려면 어떻게 해야 하나요?",
+    "context_trigger": "RULA 점수 개선 방법 질문",
+    "answer": "RULA 점수를 낮추는 가장 효과적인 방법은 점수가 높은 지표부터 우선 교정하는 것입니다.\n\n교정 우선순위 (점수 기여도 높은 순):\n\n1순위 — 목굴곡각(CVA) 교정\n→ 모니터 높이를 눈높이에 맞게 조정 (가장 빠른 효과)\n\n2순위 — 몸통굴곡각(TIA) 교정\n→ 의자 깊숙이 앉아 등받이에 기대기\n\n3순위 — 팔꿈치 각도 교정\n→ 의자 높이 조정으로 팔꿈치 90° 이상 유지\n\n4순위 — 손목 각도 교정\n→ 손목 받침대 설치, 키보드 위치 조정\n\n5순위 — 의자·책상 환경 전체 점검\n→ VDT 고시 체크리스트 항목 순서대로 확인\n\n환경 교정 후 재분석하면 일반적으로 2~3점 감소 효과를 기대할 수 있습니다.",
+    "metadata": {
+      "rula_component": "종합 개선",
+      "rula_zone": "전체",
+      "body_part": "전체",
+      "trigger": "점수 개선 방법",
+      "source": "RULA Step-by-Step Guide / fit_me_up_자세기준서"
+    }
+  },
+  {
+    "id": "F2_ZONE_EXPLAIN_001",
+    "question": "RULA Zone이 뭔가요? Zone 0, 1, 2, 3이 어떻게 다른가요?",
+    "context_trigger": "RULA Zone 개념 질문",
+    "answer": "RULA Zone은 각 신체 부위의 자세 위험도를 0~3단계로 구분한 것입니다.\n\nZone 0 — 중립 자세 (위험 없음)\n예) 목 굴곡 0~10°, 몸통 직립 0~10°\n\nZone 1 — 경미한 이탈 (주의)\n예) 목 굴곡 10~20°, 팔꿈치 약간 올라간 상태\n\nZone 2 — 유의미한 이탈 (개선 필요)\n예) 목 굴곡 20° 초과, 몸통 20~60° 전굴\n→ 자세히봐 서비스에서 Bad로 판정되는 기준\n\nZone 3 — 심각한 이탈 (즉시 교정 필요)\n예) 목이 비틀리거나 심하게 기울어진 경우, 몸통 60° 이상 전굴\n\n자세히봐 서비스는 RULA Zone 0~1을 Good, Zone 2~3을 Bad로 이진 분류하여 판정합니다.",
+    "metadata": {
+      "rula_component": "Zone 개념",
+      "rula_zone": "전체",
+      "body_part": "전체",
+      "trigger": "Zone 개념 질문",
+      "source": "RULA Step-by-Step Guide / fit_me_up_자세기준서"
+    }
+  },
+  {
+    "id": "F2_SCORE_NA_001",
+    "question": "일부 지표가 N/A로 나왔어요. 왜 그런 건가요?",
+    "context_trigger": "지표 N/A 판정",
+    "answer": "N/A는 해당 지표를 신뢰할 수 있는 정확도로 측정하지 못한 경우 표시됩니다.\n\n주요 원인:\n① 랜드마크 신뢰도(visibility)가 0.40 미만으로 신체 일부가 가려진 경우\n② 측면 촬영이 아닌 정면 또는 비스듬한 각도로 촬영된 경우\n③ 모니터나 책상이 화면에 보이지 않아 환경 지표 측정 불가\n\n해결 방법:\n① 측면에서 전신이 보이도록 카메라 위치를 조정하세요\n② 모니터·의자·책상이 모두 화면에 포함되도록 촬영하세요\n③ 조명이 충분한 환경에서 재촬영하세요\n\nN/A 지표가 3개 이상이면 분석 결과의 신뢰도가 낮아질 수 있으니 재촬영을 권장합니다.",
+    "metadata": {
+      "rula_component": "N/A 처리",
+      "rula_zone": "해당 없음",
+      "body_part": "전체",
+      "trigger": "N/A 판정",
+      "source": "fit_me_up_자세기준서 5.1.1"
+    }
+  },
+  {
+    "id": "F2_RISK_SCORE_001",
+    "question": "리스크 스코어가 뭔가요? RULA 점수랑 다른 건가요?",
+    "context_trigger": "리스크 스코어 개념 질문",
+    "answer": "리스크 스코어와 RULA 점수의 차이\n\nRULA 점수 (1~7+)\n• 정수로 표현되는 위험 등급\n• 1~2: 낮음 / 3~4: 주의 / 5~6: 중간 / 7+: 높음\n• 신체 부위별 각도를 테이블에서 교차하여 산출\n\n리스크 스코어 (0.0~1.0)\n• 소수점으로 표현되는 연속적 위험 수치\n• 경계값(예: CVA 20°)에서 급격히 변화하는 시그모이드 함수 적용\n• 0.5 미만: 안전 구간 / 0.5 이상: 위험 구간\n• 예) CVA 25° → 리스크 스코어 0.72 (위험 구간)\n\n자세히봐 서비스는 두 지표를 함께 제공하여 이진(Good/Bad) 판정과 연속적 위험 수치를 모두 확인할 수 있습니다.",
+    "metadata": {
+      "rula_component": "리스크 스코어 개념",
+      "rula_zone": "전체",
+      "body_part": "전체",
+      "trigger": "리스크 스코어 질문",
+      "source": "fit_me_up_자세기준서 5.1.3"
+    }
+  }
+]

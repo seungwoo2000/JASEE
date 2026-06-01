@@ -1,0 +1,13 @@
+{
+  "total_chunks": 0,
+  "function_distribution": {
+    "기능1": 0,
+    "기능2": 0,
+    "기능3": 0,
+    "기능4": 0,
+    "기능5": 0
+  },
+  "doc_type_distribution": {},
+  "body_part_distribution": {},
+  "quality_warnings": []
+}
